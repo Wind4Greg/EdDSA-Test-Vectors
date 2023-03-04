@@ -40,8 +40,12 @@ export const vcv2 = {
           "@id": "https://www.w3.org/2018/credentials#holder",
           "@type": "@id"
         },
-        "issued": {
-          "@id": "https://www.w3.org/2018/credentials#issued",
+        "validFrom": {
+          "@id": "https://www.w3.org/2018/credentials#validFrom",
+          "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+        },
+        "validUntil": {
+          "@id": "https://www.w3.org/2018/credentials#validUntil",
           "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
         },
         "issuer": {
@@ -49,7 +53,7 @@ export const vcv2 = {
           "@type": "@id"
         },
         "name": {
-          "@id": "https://schema.org/description",
+          "@id": "https://schema.org/name",
           "@type": "http://www.w3.org/2001/XMLSchema#string"
         },
         "proof": {
