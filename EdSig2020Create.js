@@ -44,7 +44,7 @@ writeFile('./output/docHashEdSig.txt', bytesToHex(docHash));
 let proofConfig = {};
 proofConfig.type = "Ed25519Signature2020";
 proofConfig.created = "2023-02-24T23:36:38Z";
-proofConfig.verificationMethod = "https://example.edu/issuers/565049#" + keyPair.publicKeyMultibase;
+proofConfig.verificationMethod = "https://vc.example/issuers/5678#" + keyPair.publicKeyMultibase;
 proofConfig.proofPurpose = "assertionMethod";
 proofConfig["@context"] = document["@context"]; // Missing from draft!!!
 writeFile('./output/proofConfigEdSig.json', JSON.stringify(proofConfig, null, 2));
