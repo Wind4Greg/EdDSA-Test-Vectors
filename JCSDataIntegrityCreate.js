@@ -5,22 +5,22 @@
 
 import { readFile, writeFile } from 'fs/promises';
 import { base58btc } from "multiformats/bases/base58";
-import * as ed from '@noble/ed25519';
+import { ed25519 as ed } from '@noble/curves/ed25519';
 import { sha256 } from '@noble/hashes/sha256';
 import { bytesToHex, concatBytes } from '@noble/hashes/utils';
-import  canonicalize from 'canonicalize';
+import canonicalize from 'canonicalize';
 
 const keyPair = {
-    publicKeyMultibase: "z6MkrJVnaZkeFzdQyMZu1cgjg7k1pZZ6pvBQ7XJPt4swbTQ2",
-    privateKeyMultibase: "z3u2en7t5LR2WtQH5PfFqMqwVHBeXouLzo6haApm8XHqvjxq"
+  publicKeyMultibase: "z6MkrJVnaZkeFzdQyMZu1cgjg7k1pZZ6pvBQ7XJPt4swbTQ2",
+  privateKeyMultibase: "z3u2en7t5LR2WtQH5PfFqMqwVHBeXouLzo6haApm8XHqvjxq"
 };
 
 // Read input document from a file or just specify it right here.
 let document = JSON.parse(
-    await readFile(
-      new URL('./input/unsigned.json', import.meta.url)
-    )
-  );
+  await readFile(
+    new URL('./input/unsigned.json', import.meta.url)
+  )
+);
 
 // Signed Document Creation Steps:
 

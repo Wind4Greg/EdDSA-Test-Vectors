@@ -6,7 +6,7 @@
 */
 import { readFile } from 'fs/promises';
 import { base58btc } from "multiformats/bases/base58";
-import * as ed from '@noble/ed25519';
+import {ed25519 as ed} from '@noble/curves/ed25519';
 import { sha256 } from '@noble/hashes/sha256';
 import { bytesToHex, concatBytes } from '@noble/hashes/utils';
 import  canonicalize from 'canonicalize';
@@ -15,7 +15,7 @@ import  canonicalize from 'canonicalize';
 // Read signed input document from a file or just specify it right here.
 const signedDocument = JSON.parse(
     await readFile(
-      new URL('./output/signedJCSDataIntegrity.json', import.meta.url)
+      new URL('./output/signedJCS.json', import.meta.url)
     )
   );
 

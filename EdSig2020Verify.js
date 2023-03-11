@@ -7,14 +7,14 @@ import { readFile } from 'fs/promises';
 import { localLoader } from './documentLoader.js';
 import jsonld from 'jsonld';
 import { base58btc } from "multiformats/bases/base58";
-import * as ed from '@noble/ed25519';
+import { ed25519 as ed } from '@noble/curves/ed25519';
 import { sha256 } from '@noble/hashes/sha256';
 import { bytesToHex, concatBytes } from '@noble/hashes/utils';
 
 jsonld.documentLoader = localLoader;
 
 // Read signed input document from a file or just specify it right here.
-let verifyFile = './output/signedEd25519Signature2020.json' // Use output from create
+let verifyFile = './output/signedEdSig.json' // Use output from create
 // let verifyFile = './input/chapiExample.json'; // Use CHAPI playground based example
 
 const signedDocument = JSON.parse(
