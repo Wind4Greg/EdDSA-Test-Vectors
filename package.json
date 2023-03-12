@@ -5,6 +5,7 @@
     "@noble/hashes": "^1.1.2",
     "canonicalize": "^1.0.8",
     "jsonld": "^6.0.0",
-    "multiformats": "^11.0.1"
+    "multiformats": "^11.0.1",
+    "varint": "^6.0.0"
   }
 }
