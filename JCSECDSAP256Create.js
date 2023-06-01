@@ -1,25 +1,23 @@
 /*
-    Steps to create a signed verifiable credential with an *EcdsaSecp384r1Signature2019*
+    Steps to create a signed verifiable credential with an *EcdsaSecp256r1Signature2019*
     based on "DataIntegrityProof" representation. This has not be specified in a draft yet.
 */
 
 import { readFile, writeFile } from 'fs/promises';
-import jsonld from 'jsonld';
-import { localLoader } from './documentLoader.js';
 import { base58btc } from "multiformats/bases/base58";
-import { P384 } from '@noble/curves/p384';
-import { sha384 } from '@noble/hashes/sha512';
+import { P256 } from '@noble/curves/p256';
+import { sha256 } from '@noble/hashes/sha256';
 import { bytesToHex, concatBytes, hexToBytes } from '@noble/hashes/utils';
+import canonicalize from 'canonicalize';
 
-jsonld.documentLoader = localLoader; // Local loader for JSON-LD
 
 const keyPair = {
-    publicKeyMultibase: "z82LkuBieyGShVBhvtE2zoiD6Kma4tJGFtkAhxR5pfkp5QPw4LutoYWhvQCnGjdVn14kujQ"
+    publicKeyMultibase: "zDnaepBuvsQ8cpsWrVKw8fbpGpvPeNSjVPTWoq6cRqaYzBKVP"
 };
 
 
-let privateKey = hexToBytes("6B9D3DAD2E1B8C1C05B19875B6659F4DE23C3B667BF297BA9AA47740787137D896D5724E4C70A825F872C9EA60D2EDF5");
-let publicKey = P384.getPublicKey(privateKey);
+let privateKey = hexToBytes("C9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721");
+let publicKey = P256.getPublicKey(privateKey);
 
 // Read input document from a file or just specify it right here.
 let document = JSON.parse(
@@ -31,58 +29,57 @@ let document = JSON.parse(
 // Signed Document Creation Steps:
 
 // Canonize the document
-let cannon = await jsonld.canonize(document);
+let cannon = canonicalize(document);
 console.log("Canonized unsigned document:")
 console.log(cannon);
-writeFile('./output/canonDocECDSAP384.txt', cannon);
+writeFile('./output/canonDocJCSECDSAP256.txt', cannon);
 
 
 // Hash canonized document
-let docHash = sha384(cannon); // @noble/hash will convert string to bytes via UTF-8
+let docHash = sha256(cannon); // @noble/hash will convert string to bytes via UTF-8
 console.log("Hash of canonized document in hex:")
 console.log(bytesToHex(docHash));
-writeFile('./output/docHashECDSAP384.txt', bytesToHex(docHash));
+writeFile('./output/docHashJCSECDSAP256.txt', bytesToHex(docHash));
 
 // Set proof options per draft
 let proofConfig = {};
 proofConfig.type = "DataIntegrityProof";
-proofConfig.cryptosuite = "ecdsa-2019";
+proofConfig.cryptosuite = "jcs-ecdsa-2019";
 proofConfig.created = "2023-02-24T23:36:38Z";
 proofConfig.verificationMethod = "https://vc.example/issuers/5678#" + keyPair.publicKeyMultibase;
 proofConfig.proofPurpose = "assertionMethod";
-proofConfig["@context"] = document["@context"]; // Missing from draft!!!
-writeFile('./output/proofConfigECDSAP384.json', JSON.stringify(proofConfig, null, 2));
+writeFile('./output/proofConfigJCSECDSAP256.json', JSON.stringify(proofConfig, null, 2));
 
 // canonize the proof config
-let proofCanon = await jsonld.canonize(proofConfig);
+let proofCanon = canonicalize(proofConfig);
 console.log("Proof Configuration Canonized:");
 console.log(proofCanon);
-writeFile('./output/proofCanonECDSAP384.txt', proofCanon);
+writeFile('./output/proofCanonJCSECDSAP256.txt', proofCanon);
 
 // Hash canonized proof config
-let proofHash = sha384(proofCanon); // @noble/hash will convert string to bytes via UTF-8
+let proofHash = sha256(proofCanon); // @noble/hash will convert string to bytes via UTF-8
 console.log("Hash of canonized proof in hex:")
 console.log(bytesToHex(proofHash));
-writeFile('./output/proofHashECDSAP384.txt', bytesToHex(proofHash));
+writeFile('./output/proofHashJCSECDSAP256.txt', bytesToHex(proofHash));
 
 // Combine hashes
-let combinedHash = concatBytes(proofHash, docHash); // Hash order different from draft
-writeFile('./output/combinedHashECDSAP384.txt', bytesToHex(combinedHash));
+let combinedHash = concatBytes(proofHash, docHash);
+writeFile('./output/combinedHashJCSECDSAP256.txt', bytesToHex(combinedHash));
 
 // Sign
-let msgHash = sha384(combinedHash); // Hash is done outside of the algorithm in noble/curve case.
-let signature = P384.sign(msgHash, privateKey);
+let msgHash = sha256(combinedHash); // Hash is done outside of the algorithm in noble/curve case.
+let signature = P256.sign(msgHash, privateKey);
 console.log(signature);
-writeFile('./output/sigHexECDSAP384.txt', bytesToHex(signature.toCompactRawBytes()));
+writeFile('./output/sigHexJCSECDSAP256.txt', bytesToHex(signature.toCompactRawBytes()));
 console.log("Computed Signature from private key:");
 console.log(base58btc.encode(signature.toCompactRawBytes()));
-writeFile('./output/sigBTC58ECDSAP384.txt', base58btc.encode(signature.toCompactRawBytes()));
+writeFile('./output/sigBTC58JCSECDSAP256.txt', base58btc.encode(signature.toCompactRawBytes()));
 
 // Verify (just to see we have a good private/public pair)
 let pbk = base58btc.decode(keyPair.publicKeyMultibase);
 pbk = pbk.slice(2, pbk.length); // First two bytes are multi-format indicator
 console.log(`Public Key hex: ${bytesToHex(pbk)}, Length: ${pbk.length}`);
-let result = P384.verify(signature, msgHash, pbk);
+let result = P256.verify(signature, msgHash, pbk);
 console.log(`Signature verified: ${result}`);
 
 // Construct Signed Document
@@ -92,5 +89,5 @@ signedDocument.proof = proofConfig;
 signedDocument.proof.proofValue = base58btc.encode(signature.toCompactRawBytes());
 
 console.log(JSON.stringify(signedDocument, null, 2));
-writeFile('./output/signedECDSAP384.json', JSON.stringify(signedDocument, null, 2));
+writeFile('./output/signedJCSECDSAP256.json', JSON.stringify(signedDocument, null, 2));
 
