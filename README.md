@@ -5,9 +5,9 @@
 For the EdDSA Cryptosuite v2020 draft there are currently the following 
 "Proof Representations" that need test vectors:
 
-1. DataIntegrityProof (type: "DataIntegrityProof", cryptosuite: "eddsa-2022")
+1. DataIntegrityProof (type: "DataIntegrityProof", cryptosuite: "eddsa-rdfc-2022")
 2. Ed25519Signature2020 (type: "Ed25519Signature2020"), this is "legacy" but well implemented
-3. json-eddsa-2022 (type: "DataIntegrityProof", cryptosuite: "json-eddsa-2022")
+3. eddsa-jcs-2022 (type: "DataIntegrityProof", cryptosuite: "eddsa-jcs-2022")
 
 We have create corresponding pairs of creation/verification examples to create test vectors
 that illustrate the procedures from the draft step by step using only the basic primitives
@@ -17,6 +17,8 @@ The unsigned document input to all the signing (creation) examples comes from th
 `input//unsigned.json` or can be put in line with the example code. Generated signed
 credentials are put in the `output` directory which are then used in the verification
 examples.
+
+Note that ECDSA examples/test vectors have been added for P-256 and P-384 cases with RDF and JCS canonicalization. These have crytosuite identifiers of `ecdsa-rdfc-2019` and `ecdsa-jcs-2019`. The different curves are determined for verification purposes by the public key type. For creation purposes we have separate files.
 
 ### Example Code
 
