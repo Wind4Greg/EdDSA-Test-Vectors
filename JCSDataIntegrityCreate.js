@@ -40,7 +40,7 @@ writeFile('./output/docHashJCS.txt', bytesToHex(docHash));
 // Set proof options per draft
 let proofConfig = {};
 proofConfig.type = "DataIntegrityProof";
-proofConfig.cryptosuite = "json-eddsa-2022";
+proofConfig.cryptosuite = "eddsa-jcs-2022";
 proofConfig.created = "2023-02-24T23:36:38Z";
 proofConfig.verificationMethod = "https://vc.example/issuers/5678#" + keyPair.publicKeyMultibase;
 proofConfig.proofPurpose = "assertionMethod";

@@ -42,7 +42,7 @@ writeFile('./output/docHashDataInt.txt', bytesToHex(docHash));
 // Set proof options per draft
 let proofConfig = {};
 proofConfig.type = "DataIntegrityProof";
-proofConfig.cryptosuite = "eddsa-2022";
+proofConfig.cryptosuite = "eddsa-rdfc-2022";
 proofConfig.created = "2023-02-24T23:36:38Z";
 proofConfig.verificationMethod = "https://vc.example/issuers/5678#" + keyPair.publicKeyMultibase;
 proofConfig.proofPurpose = "assertionMethod";
