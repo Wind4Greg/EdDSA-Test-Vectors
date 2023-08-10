@@ -1,0 +1,7 @@
+{
+    "@context": [
+      {"title": "https://schema.org/title"},
+      "https://www.w3.org/ns/credentials/v2"
+    ],
+    "title": "Hello world!"
+  }
