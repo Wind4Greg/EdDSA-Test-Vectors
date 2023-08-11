@@ -1,6 +1,6 @@
 /*
     Steps to verify a signed verifiable credential in the *DataIntegrityProof*
-    representation with a "ecdsa-secp256r1-2019" cryptosuite. Run this after 
+    representation with a "ecdsa-secp256r1-2019" cryptosuite. Run this after
     ECDSAP384Create.js or modify to read in
     a signed file of your choice. Caveat: No error checking is performed.
     Caveat 2: This is prior to a spec!
@@ -13,12 +13,14 @@ import { P384 } from '@noble/curves/p384';
 import { sha384 } from '@noble/hashes/sha512';
 import { bytesToHex, concatBytes } from '@noble/hashes/utils';
 
+const baseDir = "./output/ecdsa-rdfc-2019-p384/";
+
 jsonld.documentLoader = localLoader;
 
 // Read signed input document from a file or just specify it right here.
 const signedDocument = JSON.parse(
     await readFile(
-      new URL('./output/signedECDSAP384.json', import.meta.url)
+      new URL(baseDir + 'signedECDSAP384.json', import.meta.url)
     )
   );
 
@@ -65,7 +67,7 @@ let pbk = base58btc.decode(encodedPbk);
 pbk = pbk.slice(2, pbk.length); // First two bytes are multi-format indicator
 console.log(`Public Key hex: ${bytesToHex(pbk)}, Length: ${pbk.length}`);
 
-// Verify 
+// Verify
 let msgHash = sha384(combinedHash); // Hash is done outside of the algorithm in noble/curve case.
 let signature = base58btc.decode(signedDocument.proof.proofValue);
 let result = P384.verify(signature, msgHash, pbk);

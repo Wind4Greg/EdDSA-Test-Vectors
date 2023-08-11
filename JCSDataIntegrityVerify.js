@@ -11,11 +11,12 @@ import { sha256 } from '@noble/hashes/sha256';
 import { bytesToHex, concatBytes } from '@noble/hashes/utils';
 import  canonicalize from 'canonicalize';
 
+const baseDir = "./output/eddsa-jcs-2022/";
 
 // Read signed input document from a file or just specify it right here.
 const signedDocument = JSON.parse(
     await readFile(
-      new URL('./output/signedJCS.json', import.meta.url)
+      new URL(baseDir + 'signedJCS.json', import.meta.url)
     )
   );
 
@@ -62,7 +63,7 @@ let pbk = base58btc.decode(encodedPbk);
 pbk = pbk.slice(2, pbk.length); // First two bytes are multi-format indicator
 console.log(`Public Key hex: ${bytesToHex(pbk)}, Length: ${pbk.length}`);
 
-// Verify 
+// Verify
 let signature = base58btc.decode(signedDocument.proof.proofValue);
 let result = await ed.verify(signature, combinedHash, pbk);
 console.log(`Signature verified: ${result}`);

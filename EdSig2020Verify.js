@@ -11,10 +11,12 @@ import { ed25519 as ed } from '@noble/curves/ed25519';
 import { sha256 } from '@noble/hashes/sha256';
 import { bytesToHex, concatBytes } from '@noble/hashes/utils';
 
+const baseDir = "./output/Ed25519Signature2020/";
+
 jsonld.documentLoader = localLoader;
 
 // Read signed input document from a file or just specify it right here.
-let verifyFile = './output/signedEdSig.json' // Use output from create
+let verifyFile = baseDir + 'signedEdSig.json' // Use output from create
 // let verifyFile = './input/chapiExample.json'; // Use CHAPI playground based example
 
 const signedDocument = JSON.parse(
@@ -65,7 +67,7 @@ let pbk = base58btc.decode(encodedPbk);
 pbk = pbk.slice(2, pbk.length); // First two bytes are multi-format indicator
 console.log(`Public Key hex: ${bytesToHex(pbk)}, Length: ${pbk.length}`);
 
-// Verify 
+// Verify
 let signature = base58btc.decode(signedDocument.proof.proofValue);
 let result = await ed.verify(signature, combinedHash, pbk);
 console.log(`Signature verified: ${result}`);

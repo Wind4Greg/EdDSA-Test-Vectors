@@ -11,12 +11,14 @@ import {ed25519 as ed} from '@noble/curves/ed25519';
 import { sha256 } from '@noble/hashes/sha256';
 import { bytesToHex, concatBytes } from '@noble/hashes/utils';
 
+const baseDir = "./output/eddsa-rdfc-2022/";
+
 jsonld.documentLoader = localLoader;
 
 // Read signed input document from a file or just specify it right here.
 const signedDocument = JSON.parse(
     await readFile(
-      new URL('./output/signedDataInt.json', import.meta.url)
+      new URL(baseDir + 'signedDataInt.json', import.meta.url)
     )
   );
 
@@ -63,7 +65,7 @@ let pbk = base58btc.decode(encodedPbk);
 pbk = pbk.slice(2, pbk.length); // First two bytes are multi-format indicator
 console.log(`Public Key hex: ${bytesToHex(pbk)}, Length: ${pbk.length}`);
 
-// Verify 
+// Verify
 let signature = base58btc.decode(signedDocument.proof.proofValue);
 let result = await ed.verify(signature, combinedHash, pbk);
 console.log(`Signature verified: ${result}`);
