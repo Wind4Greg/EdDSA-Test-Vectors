@@ -8,6 +8,66 @@ export const vcv2 = {
     "id": "@id",
     "type": "@type",
 
+    "kid": {
+      "@id": "https://www.iana.org/assignments/jose#kid",
+      "@type": "@id"
+    },
+    "iss": {
+      "@id": "https://www.iana.org/assignments/jose#iss",
+      "@type": "@id"
+    },
+    "sub": {
+      "@id": "https://www.iana.org/assignments/jose#sub",
+      "@type": "@id"
+    },
+    "jku": {
+      "@id": "https://www.iana.org/assignments/jose#jku",
+      "@type": "@id"
+    },
+    "x5u": {
+      "@id": "https://www.iana.org/assignments/jose#x5u",
+      "@type": "@id"
+    },
+    "aud": {
+      "@id": "https://www.iana.org/assignments/jwt#aud",
+      "@type": "@id"
+    },
+    "exp": {
+      "@id": "https://www.iana.org/assignments/jwt#exp",
+      "@type": "https://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+    },
+    "nbf": {
+      "@id": "https://www.iana.org/assignments/jwt#nbf",
+      "@type": "https://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+    },
+    "iat": {
+      "@id": "https://www.iana.org/assignments/jwt#iat",
+      "@type": "https://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+    },
+    "cnf": {
+      "@id": "https://www.iana.org/assignments/jwt#cnf",
+      "@context": {
+        "@protected": true,
+        "kid": {
+          "@id": "https://www.iana.org/assignments/jwt#kid",
+          "@type": "@id"
+        },
+        "jwk": {
+          "@id": "https://www.iana.org/assignments/jwt#jwk",
+          "@type": "@json"
+        }
+      }
+    },
+    "_sd_alg": {
+      "@id": "https://www.iana.org/assignments/jwt#_sd_alg"
+    },
+    "_sd": {
+      "@id": "https://www.iana.org/assignments/jwt#_sd"
+    },
+    "...": {
+      "@id": "https://www.iana.org/assignments/jwt#..."
+    },
+
     "VerifiableCredential": {
       "@id": "https://www.w3.org/2018/credentials#VerifiableCredential",
       "@context": {
@@ -30,14 +90,12 @@ export const vcv2 = {
         },
         "description": {
           "@id": "https://schema.org/description",
-          "@type": "http://www.w3.org/2001/XMLSchema#string"
+          "@context": {
+            "value": "@value", "lang": "@language", "dir": "@direction"
+          }
         },
         "evidence": {
           "@id": "https://www.w3.org/2018/credentials#evidence",
-          "@type": "@id"
-        },
-        "holder": {
-          "@id": "https://www.w3.org/2018/credentials#holder",
           "@type": "@id"
         },
         "validFrom": {
@@ -50,11 +108,32 @@ export const vcv2 = {
         },
         "issuer": {
           "@id": "https://www.w3.org/2018/credentials#issuer",
-          "@type": "@id"
+          "@type": "@id",
+          "@context": {
+            "@protected": true,
+
+            "id": "@id",
+            "type": "@type",
+
+            "description": {
+              "@id": "https://schema.org/description",
+              "@context": {
+                "value": "@value", "lang": "@language", "dir": "@direction"
+              }
+            },
+            "name": {
+              "@id": "https://schema.org/name",
+              "@context": {
+                "value": "@value", "lang": "@language", "dir": "@direction"
+              }
+            }
+          }
         },
         "name": {
           "@id": "https://schema.org/name",
-          "@type": "http://www.w3.org/2001/XMLSchema#string"
+          "@context": {
+            "value": "@value", "lang": "@language", "dir": "@direction"
+          }
         },
         "proof": {
           "@id": "https://w3id.org/security#proof",
@@ -67,6 +146,10 @@ export const vcv2 = {
         },
         "termsOfUse": {
           "@id": "https://www.w3.org/2018/credentials#termsOfUse",
+          "@type": "@id"
+        },
+        "confidenceMethod": {
+          "@id": "https://www.w3.org/2018/credentials#confidenceMethod",
           "@type": "@id"
         }
       }
@@ -91,10 +174,78 @@ export const vcv2 = {
         "verifiableCredential": {
           "@id": "https://www.w3.org/2018/credentials#verifiableCredential",
           "@type": "@id",
-          "@container": "@graph"
+          "@container": "@graph",
+          "@context": null
         },
         "termsOfUse": {
           "@id": "https://www.w3.org/2018/credentials#termsOfUse",
+          "@type": "@id"
+        }
+      }
+    },
+
+    "JsonSchemaCredential": "https://w3.org/2018/credentials#JsonSchemaCredential",
+
+    "JsonSchema": {
+      "@id": "https://w3.org/2018/credentials#JsonSchema",
+      "@context": {
+        "@protected": true,
+
+        "id": "@id",
+        "type": "@type",
+
+        "jsonSchema": {
+           "@id": "https://w3.org/2018/credentials#jsonSchema",
+           "@type": "@json"
+        }
+      }
+    },
+
+    "StatusList2021Credential": {
+      "@id":
+        "https://w3id.org/vc/status-list#StatusList2021Credential",
+      "@context": {
+        "@protected": true,
+
+        "id": "@id",
+        "type": "@type",
+
+        "description": "https://schema.org/description",
+        "name": "https://schema.org/name"
+      }
+    },
+
+    "StatusList2021": {
+      "@id":
+        "https://w3id.org/vc/status-list#StatusList2021",
+      "@context": {
+        "@protected": true,
+
+        "id": "@id",
+        "type": "@type",
+
+        "statusPurpose":
+          "https://w3id.org/vc/status-list#statusPurpose",
+        "encodedList": "https://w3id.org/vc/status-list#encodedList"
+      }
+    },
+
+    "StatusList2021Entry": {
+      "@id":
+        "https://w3id.org/vc/status-list#StatusList2021Entry",
+      "@context": {
+        "@protected": true,
+
+        "id": "@id",
+        "type": "@type",
+
+        "statusPurpose":
+          "https://w3id.org/vc/status-list#statusPurpose",
+        "statusListIndex":
+          "https://w3id.org/vc/status-list#statusListIndex",
+        "statusListCredential": {
+          "@id":
+            "https://w3id.org/vc/status-list#statusListCredential",
           "@type": "@id"
         }
       }
@@ -117,6 +268,10 @@ export const vcv2 = {
           "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
         },
         "nonce": "https://w3id.org/security#nonce",
+        "previousProof": {
+          "@id": "https://w3id.org/security#previousProof",
+          "@type": "@id"
+        },
         "proofPurpose": {
           "@id": "https://w3id.org/security#proofPurpose",
           "@type": "@vocab",
@@ -151,7 +306,10 @@ export const vcv2 = {
             }
           }
         },
-        "cryptosuite": "https://w3id.org/security#cryptosuite",
+        "cryptosuite": {
+          "@id": "https://w3id.org/security#cryptosuite",
+          "@type": "https://w3id.org/security#cryptosuiteString"
+        },
         "proofValue": {
           "@id": "https://w3id.org/security#proofValue",
           "@type": "https://w3id.org/security#multibase"
@@ -163,4 +321,4 @@ export const vcv2 = {
       }
     }
   }
-};
+}

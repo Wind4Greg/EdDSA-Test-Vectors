@@ -35,7 +35,22 @@ let document = JSON.parse(
 // Signed Document Creation Steps:
 
 // Canonize the document
-let cannon = await jsonld.canonize(document);
+// Need to feed the canonize function a hash appropriate to the signing curve
+// and hash used with signature.
+class MessageDigest384 {
+  constructor() {
+    this.md = sha384.create()
+  }
+  update(msg) {
+    this.md.update(msg)
+  }
+  digest() {
+    return bytesToHex(this.md.digest())
+  }
+};
+const canonOptions = { algorithm: 'URDNA2015',
+  format: 'application/n-quads', createMessageDigest: () => new MessageDigest384()}
+let cannon = await jsonld.canonize(document, canonOptions);
 console.log("Canonized unsigned document:")
 console.log(cannon);
 writeFile(baseDir + 'canonDocECDSAP384.txt', cannon);
@@ -58,7 +73,7 @@ proofConfig["@context"] = document["@context"]; // Missing from draft!!!
 writeFile(baseDir + 'proofConfigECDSAP384.json', JSON.stringify(proofConfig, null, 2));
 
 // canonize the proof config
-let proofCanon = await jsonld.canonize(proofConfig);
+let proofCanon = await jsonld.canonize(proofConfig, canonOptions);
 console.log("Proof Configuration Canonized:");
 console.log(proofCanon);
 writeFile(baseDir + 'proofCanonECDSAP384.txt', proofCanon);

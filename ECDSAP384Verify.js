@@ -30,7 +30,22 @@ delete document.proof;
 console.log(document);
 
 // Canonize the document
-let cannon = await jsonld.canonize(document);
+// Need to feed the canonize function a hash appropriate to the signing curve
+// and hash used with signature.
+class MessageDigest384 {
+  constructor() {
+    this.md = sha384.create()
+  }
+  update(msg) {
+    this.md.update(msg)
+  }
+  digest() {
+    return bytesToHex(this.md.digest())
+  }
+};
+const canonOptions = { algorithm: 'URDNA2015',
+  format: 'application/n-quads', createMessageDigest: () => new MessageDigest384()}
+let cannon = await jsonld.canonize(document, canonOptions);
 console.log("Canonized unsigned document:")
 console.log(cannon);
 
@@ -49,7 +64,7 @@ proofConfig.proofPurpose = signedDocument.proof.proofPurpose;
 proofConfig["@context"] = signedDocument["@context"]; // Missing from draft!!!
 
 // canonize the proof config
-let proofCanon = await jsonld.canonize(proofConfig);
+let proofCanon = await jsonld.canonize(proofConfig, canonOptions);
 console.log("Proof Configuration Canonized:");
 console.log(proofCanon);
 
