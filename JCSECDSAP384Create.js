@@ -11,7 +11,7 @@ import { bytesToHex, concatBytes, hexToBytes } from '@noble/hashes/utils';
 import canonicalize from 'canonicalize';
 
 // Create output directory for the results
-const baseDir = "./output/ecdsa-rdfc-2019-p384/";
+const baseDir = "./output/ecdsa-jcs-2019-p384/";
 let status = await mkdir(baseDir, {recursive: true});
 const keyPair = {
     publicKeyMultibase: "z82LkuBieyGShVBhvtE2zoiD6Kma4tJGFtkAhxR5pfkp5QPw4LutoYWhvQCnGjdVn14kujQ"
