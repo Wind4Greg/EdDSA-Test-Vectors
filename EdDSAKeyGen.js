@@ -26,7 +26,7 @@ const ED25519_PRIV_PREFIX = 0x1300;
 const PRIV_PREFIX = new Uint8Array([0x80, 0x26]);
 const PUB_PREFIX = new Uint8Array([0xed, 0x01]);
 
-const NUM_KEYS = 3; // Change this to whatever you want
+const NUM_KEYS = 4; // Change this to whatever you want
 
 // Create output directory for the results
 const baseDir = "./output/ed25519-keypairs/";

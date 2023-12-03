@@ -35,14 +35,14 @@ let document = JSON.parse(
 
 // Canonize the document
 let cannon = await jsonld.canonize(document);
-console.log("Canonized unsigned document:")
-console.log(cannon);
+// console.log("Canonized unsigned document:")
+// console.log(cannon);
 // writeFile(baseDir + 'canonDocDataInt.txt', cannon);
 
 // Hash canonized document
 let docHash = sha256(cannon); // @noble/hash will convert string to bytes via UTF-8
-console.log("Hash of canonized document in hex:")
-console.log(bytesToHex(docHash));
+// console.log("Hash of canonized document in hex:")
+// console.log(bytesToHex(docHash));
 // writeFile(baseDir + 'docHashDataInt.txt', bytesToHex(docHash));
 
 // Set up proof set, two different signers proof will be an array based on two
@@ -50,7 +50,9 @@ console.log(bytesToHex(docHash));
 let setKeys = [keyPairs.keyPair1, keyPairs.keyPair2];
 let proofSet = [];
 const proofIds = ["urn:uuid:26329423-bec9-4b2e-88cb-a7c7d9dc4544",
-  "urn:uuid:8cc9022b-6b14-4cf3-8571-74972c5feb54"];
+  "urn:uuid:8cc9022b-6b14-4cf3-8571-74972c5feb54",
+  "urn:uuid:d94f792a-c546-4d06-b38a-da070ab56c23",
+  "urn:uuid:24148446-6ce5-49a6-b221-d29f1ca8a2f9"];
 
 for (let i = 0; i < setKeys.length; i++) {
   // different proof configurations
@@ -68,14 +70,14 @@ for (let i = 0; i < setKeys.length; i++) {
 
   // canonize the proof config
   let proofCanon = await jsonld.canonize(proofConfig);
-  console.log("Proof Configuration Canonized:");
-  console.log(proofCanon);
+  // console.log("Proof Configuration Canonized:");
+  // console.log(proofCanon);
   // writeFile(baseDir + 'proofCanonDataInt.txt', proofCanon);
 
   // Hash canonized proof config
   let proofHash = sha256(proofCanon); // @noble/hash will convert string to bytes via UTF-8
-  console.log("Hash of canonized proof in hex:")
-  console.log(bytesToHex(proofHash));
+  // console.log("Hash of canonized proof in hex:")
+  // console.log(bytesToHex(proofHash));
   // writeFile(baseDir + 'proofHashDataInt.txt', bytesToHex(proofHash));
 
   // Combine hashes
@@ -85,11 +87,11 @@ for (let i = 0; i < setKeys.length; i++) {
   // Sign
   let privKey = base58btc.decode(setKeys[i].privateKeyMultibase);
   privKey = privKey.slice(2, 34); // only want the first 2-34 bytes
-  console.log(`Secret key length ${privKey.length}, value in hex:`);
+  // console.log(`Secret key length ${privKey.length}, value in hex:`);
   let signature = await ed.sign(combinedHash, privKey);
   // writeFile(baseDir + 'sigHexDataInt.txt', bytesToHex(signature));
-  console.log("Computed Signature from private key:");
-  console.log(base58btc.encode(signature));
+  // console.log("Computed Signature from private key:");
+  // console.log(base58btc.encode(signature));
   // writeFile(baseDir + 'sigBTC58DataInt.txt', base58btc.encode(signature));
   proofConfig.proofValue = base58btc.encode(signature);
   delete proofConfig['@context'];
@@ -103,41 +105,55 @@ signedDocument.proof = proofSet;
 // console.log(JSON.stringify(signedDocument, null, 2));
 writeFile(baseDir + 'signedProofSet.json', JSON.stringify(signedDocument, null, 2));
 
-// Now construct a proof chain with keyPair3
-let proofConfigChain = {};
-proofConfigChain.type = "DataIntegrityProof";
-proofConfigChain.cryptosuite = "eddsa-rdfc-2022";
-proofConfigChain.created = "2023-02-25T22:36:38Z"; // Signing later
-proofConfigChain.verificationMethod = "https://vc.example/issuers/5678" + (3) +
-  "#" + keyPairs.keyPair3.publicKeyMultibase;
-proofConfigChain.proofPurpose = "assertionMethod";
-proofConfigChain["@context"] = document["@context"];
-proofConfigChain.previousProof = proofIds; // Want to include both proofs from the proof set
-// Dave's algorithm update
-document.proof = proofSet; // These are the "matching proofs" though I didn't actually check the ids
-// Canonize the "chained" document
-cannon = await jsonld.canonize(document);
-console.log("Canonized chained document:")
-console.log(cannon);
-// writeFile(baseDir + 'canonDocDataInt.txt', cannon);
+// **Proof Chains** starting from previous signed document
 
-// Hash canonized chained document
-docHash = sha256(cannon); // @noble/hash will convert string to bytes via UTF-8
-console.log("Hash of canonized document in hex:")
-console.log(bytesToHex(docHash));
-// writeFile(baseDir + 'docHashDataInt.txt', bytesToHex(docHash));
+const chainKeys = [keyPairs.keyPair3, keyPairs.keyPair4];
+// Third proof depends on both proofs in the proof set, Fourth proof just depends on third proof
+const previousProofs = [proofIds.slice(0,2), proofIds[2]];
+for (let i = 0; i < chainKeys.length; i++) {
+
+  let proofConfigChain = {};
+  proofConfigChain.type = "DataIntegrityProof";
+  if (i !== (chainKeys.length - 1)) { // Don't need id for last item in chain
+    proofConfigChain.id = proofIds[i+2];
+  }
+  proofConfigChain.cryptosuite = "eddsa-rdfc-2022";
+  proofConfigChain.created = `2023-02-26T22:${i}6:38Z`; // Signing later
+  proofConfigChain.verificationMethod = "https://vc.example/issuers/5678" + (i + 3) +
+    "#" + keyPairs.keyPair3.publicKeyMultibase;
+  proofConfigChain.proofPurpose = "assertionMethod";
+  proofConfigChain["@context"] = document["@context"];
+  proofConfigChain.previousProof = previousProofs[i]; // Want to include both proofs from the proof set
+  // Dave's algorithm update
+  let matches = new Set();
+  findMatchingProofs(proofConfigChain.previousProof, signedDocument.proof, matches);
+  let matchingProofs = Array.from(matches); //(proofConfigChain.previousProof, signedDocument.proof)
+  document.proof = matchingProofs; // These are the "matching proofs" though I didn't actually check the ids
+  console.log(`Matching proofs for i = ${i}`);
+  console.log(matchingProofs);
+  // Canonize the "chained" document
+  cannon = await jsonld.canonize(document);
+  // console.log("Canonized chained document:")
+  // console.log(cannon);
+  // writeFile(baseDir + 'canonDocDataInt.txt', cannon);
+
+  // Hash canonized chained document
+  docHash = sha256(cannon); // @noble/hash will convert string to bytes via UTF-8
+  // console.log("Hash of canonized document in hex:")
+  // console.log(bytesToHex(docHash));
+  // writeFile(baseDir + 'docHashDataInt.txt', bytesToHex(docHash));
 
 
   // canonize the proof config
   let proofCanon = await jsonld.canonize(proofConfigChain);
-  console.log("Proof Configuration Chain Canonized:");
-  console.log(proofCanon);
+  // console.log("Proof Configuration Chain Canonized:");
+  // console.log(proofCanon);
   // writeFile(baseDir + 'proofCanonDataInt.txt', proofCanon);
 
   // Hash canonized proof config
   let proofHash = sha256(proofCanon); // @noble/hash will convert string to bytes via UTF-8
-  console.log("Hash of canonized proof in hex:")
-  console.log(bytesToHex(proofHash));
+  // console.log("Hash of canonized proof in hex:")
+  // console.log(bytesToHex(proofHash));
   // writeFile(baseDir + 'proofHashDataInt.txt', bytesToHex(proofHash));
 
   // Combine hashes
@@ -147,20 +163,38 @@ console.log(bytesToHex(docHash));
   // Sign
   let privKey = base58btc.decode(keyPairs.keyPair3.privateKeyMultibase);
   privKey = privKey.slice(2, 34); // only want the first 2-34 bytes
-  console.log(`Secret key length ${privKey.length}, value in hex:`);
+  // console.log(`Secret key length ${privKey.length}, value in hex:`);
   let signature = await ed.sign(combinedHash, privKey);
   // writeFile(baseDir + 'sigHexDataInt.txt', bytesToHex(signature));
-  console.log("Computed Chain Signature from private key:");
-  console.log(base58btc.encode(signature));
+  // console.log("Computed Chain Signature from private key:");
+  // console.log(base58btc.encode(signature));
   // writeFile(baseDir + 'sigBTC58DataInt.txt', base58btc.encode(signature));
   proofConfigChain.proofValue = base58btc.encode(signature);
   delete proofConfigChain['@context'];
-  let allProofs = proofSet.concat(proofConfigChain);
+  let allProofs = matchingProofs.concat(proofConfigChain);
 // Construct Signed Document
   signedDocument = Object.assign({}, document);
   signedDocument.proof = allProofs;
 
 // console.log(JSON.stringify(signedDocument, null, 2));
-writeFile(baseDir + 'signedProofChain.json', JSON.stringify(signedDocument, null, 2));
+  writeFile(baseDir + `signedProofChain${i+1}.json`, JSON.stringify(signedDocument, null, 2));
+}
 
 
+// function to get all matching proofs and their dependencies
+// prevProofs is either a string or an array
+// proofs is an array of proofs
+// matches is and empty set that you provide and will contain the result
+function findMatchingProofs(prevProofs, proofs, matches) {
+  console.log(`findMatch called with ${prevProofs}`);
+  if (Array.isArray(prevProofs)) {
+      prevProofs.forEach(pp => findMatchingProofs(pp, proofs, matches))
+  } else {
+      let matchProof = proofs.find(p => p.id === prevProofs)
+      matches.add(matchProof);
+      // Check for dependencies
+      if (matchProof.previousProof) {
+          findMatchingProofs(matchProof.previousProof, proofs, matches)
+      }
+  }
+}
