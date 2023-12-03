@@ -54,6 +54,7 @@ const proofIds = ["urn:uuid:26329423-bec9-4b2e-88cb-a7c7d9dc4544",
   "urn:uuid:d94f792a-c546-4d06-b38a-da070ab56c23",
   "urn:uuid:24148446-6ce5-49a6-b221-d29f1ca8a2f9"];
 
+// Proof Sets processing loop
 for (let i = 0; i < setKeys.length; i++) {
   // different proof configurations
   // Set proof options per draft
@@ -65,8 +66,9 @@ for (let i = 0; i < setKeys.length; i++) {
   proofConfig.verificationMethod = "https://vc.example/issuers/5678" + (i+1) +
     "#" + setKeys[i].publicKeyMultibase;
   proofConfig.proofPurpose = "assertionMethod";
-  proofConfig["@context"] = document["@context"]; // Missing from draft!!!
-  // writeFile(baseDir + 'proofConfigDataInt.json', JSON.stringify(proofConfig, null, 2));
+  writeFile(baseDir + `proofSetConfig${i+1}.json`, JSON.stringify(proofConfig, null, 2));
+  proofConfig["@context"] = document["@context"];
+
 
   // canonize the proof config
   let proofCanon = await jsonld.canonize(proofConfig);
@@ -95,6 +97,7 @@ for (let i = 0; i < setKeys.length; i++) {
   // writeFile(baseDir + 'sigBTC58DataInt.txt', base58btc.encode(signature));
   proofConfig.proofValue = base58btc.encode(signature);
   delete proofConfig['@context'];
+  writeFile(baseDir + `proofSetConfigSigned${i+1}.json`, JSON.stringify(proofConfig, null, 2));
   proofSet.push(proofConfig);
 }
 
@@ -111,19 +114,21 @@ const chainKeys = [keyPairs.keyPair3, keyPairs.keyPair4];
 // Third proof depends on both proofs in the proof set, Fourth proof just depends on third proof
 const previousProofs = [proofIds.slice(0,2), proofIds[2]];
 for (let i = 0; i < chainKeys.length; i++) {
-
+  // Set up the proof configuration for the chain
   let proofConfigChain = {};
   proofConfigChain.type = "DataIntegrityProof";
   if (i !== (chainKeys.length - 1)) { // Don't need id for last item in chain
     proofConfigChain.id = proofIds[i+2];
   }
   proofConfigChain.cryptosuite = "eddsa-rdfc-2022";
-  proofConfigChain.created = `2023-02-26T22:${i}6:38Z`; // Signing later
+  proofConfigChain.created = `2023-02-26T22:${i}6:38Z`; // Signing later for realism ;-)
   proofConfigChain.verificationMethod = "https://vc.example/issuers/5678" + (i + 3) +
     "#" + keyPairs.keyPair3.publicKeyMultibase;
   proofConfigChain.proofPurpose = "assertionMethod";
-  proofConfigChain["@context"] = document["@context"];
+
   proofConfigChain.previousProof = previousProofs[i]; // Want to include both proofs from the proof set
+  writeFile(baseDir + `proofChainConfig${i+1}.json`, JSON.stringify(proofConfigChain, null, 2));
+  proofConfigChain["@context"] = document["@context"];
   // Dave's algorithm update
   let matches = new Set();
   findMatchingProofs(proofConfigChain.previousProof, signedDocument.proof, matches);
@@ -132,6 +137,7 @@ for (let i = 0; i < chainKeys.length; i++) {
   console.log(`Matching proofs for i = ${i}`);
   console.log(matchingProofs);
   // Canonize the "chained" document
+  writeFile(baseDir + `proofChainTempDoc${i+1}.json`, JSON.stringify(document, null, 2));
   cannon = await jsonld.canonize(document);
   // console.log("Canonized chained document:")
   // console.log(cannon);
@@ -171,6 +177,7 @@ for (let i = 0; i < chainKeys.length; i++) {
   // writeFile(baseDir + 'sigBTC58DataInt.txt', base58btc.encode(signature));
   proofConfigChain.proofValue = base58btc.encode(signature);
   delete proofConfigChain['@context'];
+  writeFile(baseDir + `proofChainConfigSigned${i+1}.json`, JSON.stringify(proofConfigChain, null, 2));
   let allProofs = matchingProofs.concat(proofConfigChain);
 // Construct Signed Document
   signedDocument = Object.assign({}, document);
