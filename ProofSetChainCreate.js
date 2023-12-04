@@ -46,7 +46,6 @@ let docHash = sha256(cannon); // @noble/hash will convert string to bytes via UT
 // writeFile(baseDir + 'docHashDataInt.txt', bytesToHex(docHash));
 
 // Set up proof set, two different signers proof will be an array based on two
-
 let setKeys = [keyPairs.keyPair1, keyPairs.keyPair2];
 let proofSet = [];
 const proofIds = ["urn:uuid:26329423-bec9-4b2e-88cb-a7c7d9dc4544",
@@ -114,6 +113,7 @@ const chainKeys = [keyPairs.keyPair3, keyPairs.keyPair4];
 // Third proof depends on both proofs in the proof set, Fourth proof just depends on third proof
 const previousProofs = [proofIds.slice(0,2), proofIds[2]];
 for (let i = 0; i < chainKeys.length; i++) {
+  let allProofs = signedDocument.proof;
   // Set up the proof configuration for the chain
   let proofConfigChain = {};
   proofConfigChain.type = "DataIntegrityProof";
@@ -130,10 +130,8 @@ for (let i = 0; i < chainKeys.length; i++) {
   writeFile(baseDir + `proofChainConfig${i+1}.json`, JSON.stringify(proofConfigChain, null, 2));
   proofConfigChain["@context"] = document["@context"];
   // Dave's algorithm update
-  let matches = new Set();
-  findMatchingProofs(proofConfigChain.previousProof, signedDocument.proof, matches);
-  let matchingProofs = Array.from(matches); //(proofConfigChain.previousProof, signedDocument.proof)
-  document.proof = matchingProofs; // These are the "matching proofs" though I didn't actually check the ids
+  let matchingProofs = findMatchingProofs(proofConfigChain.previousProof, allProofs);
+  document.proof = matchingProofs;
   console.log(`Matching proofs for i = ${i}`);
   console.log(matchingProofs);
   // Canonize the "chained" document
@@ -178,30 +176,35 @@ for (let i = 0; i < chainKeys.length; i++) {
   proofConfigChain.proofValue = base58btc.encode(signature);
   delete proofConfigChain['@context'];
   writeFile(baseDir + `proofChainConfigSigned${i+1}.json`, JSON.stringify(proofConfigChain, null, 2));
-  let allProofs = matchingProofs.concat(proofConfigChain);
+
 // Construct Signed Document
   signedDocument = Object.assign({}, document);
-  signedDocument.proof = allProofs;
+  signedDocument.proof = allProofs.concat(proofConfigChain);
 
 // console.log(JSON.stringify(signedDocument, null, 2));
   writeFile(baseDir + `signedProofChain${i+1}.json`, JSON.stringify(signedDocument, null, 2));
 }
 
-
-// function to get all matching proofs and their dependencies
+// function to get all matching proofs (only first level no dependencies)
 // prevProofs is either a string or an array
 // proofs is an array of proofs
-// matches is and empty set that you provide and will contain the result
-function findMatchingProofs(prevProofs, proofs, matches) {
+function findMatchingProofs(prevProofs, proofs) {
   console.log(`findMatch called with ${prevProofs}`);
+  let matches = [];
   if (Array.isArray(prevProofs)) {
-      prevProofs.forEach(pp => findMatchingProofs(pp, proofs, matches))
+      prevProofs.forEach(pp => {
+        let matchProof = proofs.find(p => p.id === pp);
+        if (!matchProof) {
+          throw new Error(`Missing proof for id = ${pp}`);
+        }
+        matches.push(matchProof);
+      })
   } else {
-      let matchProof = proofs.find(p => p.id === prevProofs)
-      matches.add(matchProof);
-      // Check for dependencies
-      if (matchProof.previousProof) {
-          findMatchingProofs(matchProof.previousProof, proofs, matches)
+      let matchProof = proofs.find(p => p.id === prevProofs);
+      if (!matchProof) {
+        throw new Error(`Missing proof for id = ${prevProofs}`);
       }
+      matches.push(matchProof);
   }
+  return matches;
 }

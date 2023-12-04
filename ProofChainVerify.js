@@ -34,9 +34,7 @@ if (!Array.isArray(proofs)) { // If not an array make it a one element array
 for (let proof of proofs) {
     // Get matching, depending
     if (proof.previousProof) {
-        let matches = new Set();
-        findMatchingProofs(proof.previousProof, proofs, matches);
-        let matchingProofs = Array.from(matches); //(proofConfigChain.previousProof, signedDocument.proof)
+        let matchingProofs = findMatchingProofs(proof.previousProof, proofs);
         document.proof = matchingProofs; // These are the "matching proofs" though I didn't actually check the ids
         console.log(`Matching proofs for proof = ${proof}`);
         console.log(matchingProofs);
@@ -81,19 +79,26 @@ for (let proof of proofs) {
     console.log(`Signature verified: ${result}`);
 }
 
-// function to get all matching proofs and their dependencies
+// function to get all matching proofs (only first level no dependencies)
 // prevProofs is either a string or an array
 // proofs is an array of proofs
-// matches is and empty set that you provide and will contain the result
-function findMatchingProofs(prevProofs, proofs, matches) {
+function findMatchingProofs(prevProofs, proofs) {
+    console.log(`findMatch called with ${prevProofs}`);
+    let matches = [];
     if (Array.isArray(prevProofs)) {
-        prevProofs.forEach(pp => findMatchingProofs(pp, proofs, matches))
+        prevProofs.forEach(pp => {
+          let matchProof = proofs.find(p => p.id === pp);
+          if (!matchProof) {
+            throw new Error(`Missing proof for id = ${pp}`);
+          }
+          matches.push(matchProof);
+        })
     } else {
-        let matchProof = proofs.find(p => p.id === prevProofs)
-        matches.add(matchProof);
-        // Check for dependencies
-        if (matchProof.previousProof) {
-            findMatchingProofs(matchProof.previousProof, proofs, matches)
+        let matchProof = proofs.find(p => p.id === prevProofs);
+        if (!matchProof) {
+          throw new Error(`Missing proof for id = ${prevProofs}`);
         }
+        matches.push(matchProof);
     }
-}
+    return matches;
+  }
