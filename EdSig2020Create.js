@@ -25,7 +25,7 @@ const keyPair = {
 // Read input document from a file or just specify it right here.
 let document = JSON.parse(
     await readFile(
-      new URL('./input/unsigned.json', import.meta.url)
+      new URL('./input/unsignedEd2020.json', import.meta.url)
     )
   );
 

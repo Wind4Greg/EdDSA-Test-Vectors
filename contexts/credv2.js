@@ -68,6 +68,25 @@ export const vcv2 = {
       "@id": "https://www.iana.org/assignments/jwt#..."
     },
 
+    "digestSRI": {
+      "@id": "https://www.w3.org/2018/credentials#digestSRI",
+      "@type": "https://www.w3.org/2018/credentials#sriString"
+    },
+    "digestMultibase": {
+      "@id": "https://w3id.org/security#digestMultibase",
+      "@type": "https://w3id.org/security#multibase"
+    },
+
+    "mediaType": {
+      "@id": "https://schema.org/encodingFormat"
+    },
+
+    "description": "https://schema.org/description",
+    "name": "https://schema.org/name",
+
+    "EnvelopedVerifiableCredential":
+      "https://www.w3.org/2018/credentials#EnvelopedVerifiableCredential",
+
     "VerifiableCredential": {
       "@id": "https://www.w3.org/2018/credentials#VerifiableCredential",
       "@context": {
@@ -88,12 +107,7 @@ export const vcv2 = {
           "@id": "https://www.w3.org/2018/credentials#credentialSubject",
           "@type": "@id"
         },
-        "description": {
-          "@id": "https://schema.org/description",
-          "@context": {
-            "value": "@value", "lang": "@language", "dir": "@direction"
-          }
-        },
+        "description": "https://schema.org/description",
         "evidence": {
           "@id": "https://www.w3.org/2018/credentials#evidence",
           "@type": "@id"
@@ -108,33 +122,9 @@ export const vcv2 = {
         },
         "issuer": {
           "@id": "https://www.w3.org/2018/credentials#issuer",
-          "@type": "@id",
-          "@context": {
-            "@protected": true,
-
-            "id": "@id",
-            "type": "@type",
-
-            "description": {
-              "@id": "https://schema.org/description",
-              "@context": {
-                "value": "@value", "lang": "@language", "dir": "@direction"
-              }
-            },
-            "name": {
-              "@id": "https://schema.org/name",
-              "@context": {
-                "value": "@value", "lang": "@language", "dir": "@direction"
-              }
-            }
-          }
+          "@type": "@id"
         },
-        "name": {
-          "@id": "https://schema.org/name",
-          "@context": {
-            "value": "@value", "lang": "@language", "dir": "@direction"
-          }
-        },
+        "name": "https://schema.org/name",
         "proof": {
           "@id": "https://w3id.org/security#proof",
           "@type": "@id",
@@ -151,6 +141,10 @@ export const vcv2 = {
         "confidenceMethod": {
           "@id": "https://www.w3.org/2018/credentials#confidenceMethod",
           "@type": "@id"
+        },
+        "relatedResource": {
+          "@id": "https://www.w3.org/2018/credentials#relatedResource",
+          "@type": "@id"
         }
       }
     },
@@ -162,6 +156,7 @@ export const vcv2 = {
 
         "id": "@id",
         "type": "@type",
+
         "holder": {
           "@id": "https://www.w3.org/2018/credentials#holder",
           "@type": "@id"
@@ -184,10 +179,10 @@ export const vcv2 = {
       }
     },
 
-    "JsonSchemaCredential": "https://w3.org/2018/credentials#JsonSchemaCredential",
+    "JsonSchemaCredential": "https://www.w3.org/2018/credentials#JsonSchemaCredential",
 
     "JsonSchema": {
-      "@id": "https://w3.org/2018/credentials#JsonSchema",
+      "@id": "https://www.w3.org/2018/credentials#JsonSchema",
       "@context": {
         "@protected": true,
 
@@ -195,29 +190,16 @@ export const vcv2 = {
         "type": "@type",
 
         "jsonSchema": {
-           "@id": "https://w3.org/2018/credentials#jsonSchema",
-           "@type": "@json"
+          "@id": "https://w3.org/2018/credentials#jsonSchema",
+          "@type": "@json"
         }
       }
     },
 
-    "StatusList2021Credential": {
-      "@id":
-        "https://w3id.org/vc/status-list#StatusList2021Credential",
-      "@context": {
-        "@protected": true,
+    "BitstringStatusListCredential": "https://www.w3.org/ns/credentials/status#BitstringStatusListCredential",
 
-        "id": "@id",
-        "type": "@type",
-
-        "description": "https://schema.org/description",
-        "name": "https://schema.org/name"
-      }
-    },
-
-    "StatusList2021": {
-      "@id":
-        "https://w3id.org/vc/status-list#StatusList2021",
+    "BitstringStatusList": {
+      "@id": "https://www.w3.org/ns/credentials/status#BitstringStatusList",
       "@context": {
         "@protected": true,
 
@@ -225,14 +207,32 @@ export const vcv2 = {
         "type": "@type",
 
         "statusPurpose":
-          "https://w3id.org/vc/status-list#statusPurpose",
-        "encodedList": "https://w3id.org/vc/status-list#encodedList"
+          "https://www.w3.org/ns/credentials/status#statusPurpose",
+        "encodedList": {
+          "@id": "https://www.w3.org/ns/credentials/status#encodedList",
+          "@type": "https://w3id.org/security#multibase"
+        },
+        "ttl": "https://www.w3.org/ns/credentials/status#ttl",
+        "statusReference": "https://www.w3.org/ns/credentials/status#statusReference",
+        "statusSize": "https://www.w3.org/ns/credentials/status#statusSize",
+        "statusMessage": {
+          "@id": "https://www.w3.org/ns/credentials/status#statusMessage",
+          "@context": {
+            "@protected": true,
+
+            "id": "@id",
+            "type": "@type",
+
+            "status": "https://www.w3.org/ns/credentials/status#status",
+            "message": "https://www.w3.org/ns/credentials/status#message"
+          }
+        }
       }
     },
 
-    "StatusList2021Entry": {
+    "BitstringStatusListEntry": {
       "@id":
-        "https://w3id.org/vc/status-list#StatusList2021Entry",
+        "https://www.w3.org/ns/credentials/status#BitstringStatusListEntry",
       "@context": {
         "@protected": true,
 
@@ -240,12 +240,12 @@ export const vcv2 = {
         "type": "@type",
 
         "statusPurpose":
-          "https://w3id.org/vc/status-list#statusPurpose",
+          "https://www.w3.org/ns/credentials/status#statusPurpose",
         "statusListIndex":
-          "https://w3id.org/vc/status-list#statusListIndex",
+          "https://www.w3.org/ns/credentials/status#statusListIndex",
         "statusListCredential": {
           "@id":
-            "https://w3id.org/vc/status-list#statusListCredential",
+            "https://www.w3.org/ns/credentials/status#statusListCredential",
           "@type": "@id"
         }
       }
