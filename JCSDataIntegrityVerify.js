@@ -10,6 +10,7 @@ import {ed25519 as ed} from '@noble/curves/ed25519';
 import { sha256 } from '@noble/hashes/sha256';
 import { bytesToHex, concatBytes } from '@noble/hashes/utils';
 import  canonicalize from 'canonicalize';
+import equal from 'deep-equal';
 
 const baseDir = "./output/eddsa-jcs-2022/";
 
@@ -25,6 +26,32 @@ let document = Object.assign({}, signedDocument);
 delete document.proof;
 console.log(document);
 
+// Set proof options per draft
+let proofConfig = {};
+proofConfig.type = signedDocument.proof.type;
+proofConfig.cryptosuite = signedDocument.proof.cryptosuite;
+proofConfig.created = signedDocument.proof.created;
+proofConfig.verificationMethod = signedDocument.proof.verificationMethod;
+proofConfig.proofPurpose = signedDocument.proof.proofPurpose;
+proofConfig["@context"] = signedDocument.proof["@context"];
+
+// check document context relative to proof context
+const docContext = document["@context"];
+const proofContext = proofConfig["@context"];
+// Note from DM 2.0 the @context field must be an array
+let verifyContext = true;
+for (let i = 0; i < proofContext.length; i++) {
+  if (typeof proofContext[i] == 'string') {
+    verifyContext = proofContext[i] === docContext[i];
+  } else {
+    verifyContext = equal(proofContext[i], docContext[i]);
+  }
+  if (!verifyContext) {
+    console.log(`@context not verified: ${proofContext[i]} not equal to ${docContext[i]}`);
+  }
+}
+
+document['@context'] = proofContext; // For JCS we now do this.
 // Canonize the document
 let cannon = canonicalize(document);
 console.log("Canonized unsigned document:")
@@ -35,14 +62,7 @@ let docHash = sha256(cannon); // @noble/hash will convert string to bytes via UT
 console.log("Hash of canonized document in hex:")
 console.log(bytesToHex(docHash));
 
-// Set proof options per draft
-let proofConfig = {};
-proofConfig.type = signedDocument.proof.type;
-proofConfig.cryptosuite = signedDocument.proof.cryptosuite;
-proofConfig.created = signedDocument.proof.created;
-proofConfig.verificationMethod = signedDocument.proof.verificationMethod;
-proofConfig.proofPurpose = signedDocument.proof.proofPurpose;
-// proofConfig["@context"] = signedDocument["@context"]; // Don't really need
+
 
 // canonize the proof config
 let proofCanon = canonicalize(proofConfig);

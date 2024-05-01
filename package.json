@@ -4,6 +4,7 @@
     "@noble/curves": "^0.8.0",
     "@noble/hashes": "^1.1.2",
     "canonicalize": "^1.0.8",
+    "deep-equal": "^2.2.3",
     "jsonld": "^6.0.0",
     "multiformats": "^11.0.1",
     "varint": "^6.0.0"
