@@ -15,6 +15,7 @@ import equal from 'deep-equal';
 const baseDir = "./output/eddsa-jcs-2022/";
 
 // Read signed input document from a file or just specify it right here.
+// Use 'signedJCSOldStyle.json' or 'signedJCS.json'
 const signedDocument = JSON.parse(
     await readFile(
       new URL(baseDir + 'signedJCS.json', import.meta.url)
@@ -38,20 +39,21 @@ proofConfig["@context"] = signedDocument.proof["@context"];
 // check document context relative to proof context
 const docContext = document["@context"];
 const proofContext = proofConfig["@context"];
-// Note from DM 2.0 the @context field must be an array
-let verifyContext = true;
-for (let i = 0; i < proofContext.length; i++) {
-  if (typeof proofContext[i] == 'string') {
-    verifyContext = proofContext[i] === docContext[i];
-  } else {
-    verifyContext = equal(proofContext[i], docContext[i]);
+if (proofContext) {
+  // Note from DM 2.0 the @context field must be an array
+  let verifyContext = true;
+  for (let i = 0; i < proofContext.length; i++) {
+    if (typeof proofContext[i] == 'string') {
+      verifyContext = proofContext[i] === docContext[i];
+    } else {
+      verifyContext = equal(proofContext[i], docContext[i]);
+    }
+    if (!verifyContext) {
+      console.log(`@context not verified: ${proofContext[i]} not equal to ${docContext[i]}`);
+    }
   }
-  if (!verifyContext) {
-    console.log(`@context not verified: ${proofContext[i]} not equal to ${docContext[i]}`);
-  }
+  document['@context'] = proofContext; // For JCS we now do this.
 }
-
-document['@context'] = proofContext; // For JCS we now do this.
 // Canonize the document
 let cannon = canonicalize(document);
 console.log("Canonized unsigned document:")
