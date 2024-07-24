@@ -87,5 +87,5 @@ console.log(`Public Key hex: ${bytesToHex(pbk)}, Length: ${pbk.length}`);
 
 // Verify
 let signature = base58btc.decode(signedDocument.proof.proofValue);
-let result = await ed.verify(signature, combinedHash, pbk);
+let result = ed.verify(signature, combinedHash, pbk);
 console.log(`Signature verified: ${result}`);

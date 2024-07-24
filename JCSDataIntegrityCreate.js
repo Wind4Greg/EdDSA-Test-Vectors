@@ -72,7 +72,7 @@ writeFile(baseDir + 'combinedHashJCS.txt', bytesToHex(combinedHash));
 let privKey = base58btc.decode(keyPair.privateKeyMultibase);
 privKey = privKey.slice(2, 34); // only want the first 2-34 bytes
 console.log(`Secret key length ${privKey.length}, value in hex:`);
-let signature = await ed.sign(combinedHash, privKey);
+let signature = ed.sign(combinedHash, privKey);
 writeFile(baseDir + 'sigHexJCS.txt', bytesToHex(signature));
 console.log("Computed Signature from private key:");
 console.log(base58btc.encode(signature));
