@@ -62,8 +62,11 @@ for (let i = 0; i < setKeys.length; i++) {
   proofConfig.id = proofIds[i];
   proofConfig.cryptosuite = "eddsa-rdfc-2022";
   proofConfig.created = "2023-02-24T23:36:38Z";
-  proofConfig.verificationMethod = "https://vc.example/issuers/5678" + (i+1) +
-    "#" + setKeys[i].publicKeyMultibase;
+  // proofConfig.verificationMethod = "https://vc.example/issuers/5678" + (i+1) +
+  //   "#" + setKeys[i].publicKeyMultibase;
+  proofConfig.verificationMethod = 'did:key:' + setKeys[i].publicKeyMultibase 
+    + '#' + setKeys[i].publicKeyMultibase;
+
   proofConfig.proofPurpose = "assertionMethod";
   writeFile(baseDir + `proofSetConfig${i+1}.json`, JSON.stringify(proofConfig, null, 2));
   proofConfig["@context"] = document["@context"];
@@ -122,8 +125,11 @@ for (let i = 0; i < chainKeys.length; i++) {
   }
   proofConfigChain.cryptosuite = "eddsa-rdfc-2022";
   proofConfigChain.created = `2023-02-26T22:${i}6:38Z`; // Signing later for realism ;-)
-  proofConfigChain.verificationMethod = "https://vc.example/issuers/5678" + (i + 3) +
-    "#" + keyPairs.keyPair3.publicKeyMultibase;
+  // proofConfigChain.verificationMethod = "https://vc.example/issuers/5678" + (i + 3) +
+  //   "#" + keyPairs.keyPair3.publicKeyMultibase;
+  proofConfigChain.verificationMethod = 'did:key:' + keyPairs.keyPair3.publicKeyMultibase + 
+    '#' + keyPairs.keyPair3.publicKeyMultibase;
+
   proofConfigChain.proofPurpose = "assertionMethod";
 
   proofConfigChain.previousProof = previousProofs[i]; // Want to include both proofs from the proof set
