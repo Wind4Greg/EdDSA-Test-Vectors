@@ -48,7 +48,9 @@ let proofConfig = {};
 proofConfig.type = "DataIntegrityProof";
 proofConfig.cryptosuite = "ecdsa-jcs-2019";
 proofConfig.created = "2023-02-24T23:36:38Z";
-proofConfig.verificationMethod = "https://vc.example/issuers/5678#" + keyPair.publicKeyMultibase;
+// proofConfig.verificationMethod = "https://vc.example/issuers/5678#" + keyPair.publicKeyMultibase;
+proofConfig.verificationMethod = 'did:key:' + keyPair.publicKeyMultibase + '#' 
+  + keyPair.publicKeyMultibase;
 proofConfig.proofPurpose = "assertionMethod";
 writeFile(baseDir + 'proofConfigJCSECDSAP384.json', JSON.stringify(proofConfig, null, 2));
 

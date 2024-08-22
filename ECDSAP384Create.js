@@ -67,7 +67,9 @@ let proofConfig = {};
 proofConfig.type = "DataIntegrityProof";
 proofConfig.cryptosuite = "ecdsa-rdfc-2019";
 proofConfig.created = "2023-02-24T23:36:38Z";
-proofConfig.verificationMethod = "https://vc.example/issuers/5678#" + keyPair.publicKeyMultibase;
+// proofConfig.verificationMethod = "https://vc.example/issuers/5678#" + keyPair.publicKeyMultibase;
+proofConfig.verificationMethod = 'did:key:' + keyPair.publicKeyMultibase + '#' 
+  + keyPair.publicKeyMultibase;
 proofConfig.proofPurpose = "assertionMethod";
 proofConfig["@context"] = document["@context"]; // Missing from draft!!!
 writeFile(baseDir + 'proofConfigECDSAP384.json', JSON.stringify(proofConfig, null, 2));
