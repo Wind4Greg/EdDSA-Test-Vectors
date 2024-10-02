@@ -127,8 +127,8 @@ for (let i = 0; i < chainKeys.length; i++) {
   proofConfigChain.created = `2023-02-26T22:${i}6:38Z`; // Signing later for realism ;-)
   // proofConfigChain.verificationMethod = "https://vc.example/issuers/5678" + (i + 3) +
   //   "#" + keyPairs.keyPair3.publicKeyMultibase;
-  proofConfigChain.verificationMethod = 'did:key:' + keyPairs.keyPair3.publicKeyMultibase + 
-    '#' + keyPairs.keyPair3.publicKeyMultibase;
+  proofConfigChain.verificationMethod = 'did:key:' + chainKeys[i].publicKeyMultibase + 
+    '#' + chainKeys[i].publicKeyMultibase;
 
   proofConfigChain.proofPurpose = "assertionMethod";
 
@@ -171,7 +171,7 @@ for (let i = 0; i < chainKeys.length; i++) {
   // writeFile(baseDir + 'combinedHashDataInt.txt', bytesToHex(combinedHash));
 
   // Sign
-  let privKey = base58btc.decode(keyPairs.keyPair3.privateKeyMultibase);
+  let privKey = base58btc.decode(chainKeys[i].privateKeyMultibase);
   privKey = privKey.slice(2, 34); // only want the first 2-34 bytes
   // console.log(`Secret key length ${privKey.length}, value in hex:`);
   let signature = await ed.sign(combinedHash, privKey);
