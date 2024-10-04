@@ -80,7 +80,7 @@ async function secureDocument({
     let proofConfigChain = {};
     proofConfigChain.type = "DataIntegrityProof";
     if (i !== (chainKeys.length - 1)) { // Don't need id for last item in chain
-      proofConfigChain.id = proofIds[i];
+      proofConfigChain.id = String(proofIds[i]);
     }
     proofConfigChain.cryptosuite = "eddsa-rdfc-2022";
     proofConfigChain.created = `2023-02-26T22:${i}6:38Z`; // Signing later for realism ;-)
@@ -155,7 +155,7 @@ function findMatchingProofs(prevProofs, proofs) {
         matches.push(matchProof);
       })
   } else {
-      let matchProof = proofs.find(p => p.id === prevProofs);
+      let matchProof = proofs.find(p => p.id === String(prevProofs));
       if (!matchProof) {
         throw new Error(`Missing proof for id = ${prevProofs}`);
       }
@@ -194,8 +194,8 @@ for(const [version, credential] of documents) {
 for(const [version, credential] of documents) {
   await secureDocument({
     credential,
-    fileName: `${version}-previousProofNotUrlFail`,
+    fileName: `${version}-previousProofNotStringFail`,
     previousProofType: 'string',
-    proofIds: ['notUrl']
+    proofIds: [456321]
   });
 }
