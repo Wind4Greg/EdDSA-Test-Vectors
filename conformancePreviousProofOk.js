@@ -32,7 +32,7 @@ const documents = new Map([
 ]);
 
 
-async function secureDocument(document) {
+async function secureDocument({version, document}) {
   // Signed Document Creation Steps:
   
   // Canonize the document
@@ -83,7 +83,7 @@ async function secureDocument(document) {
     if (previousProofs[i]) { // If no previous proof don't set the option.
       proofConfigChain.previousProof = previousProofs[i];
     }
-    writeFile(baseDir + `proofChainSimpleConfig${i+1}.json`, JSON.stringify(proofConfigChain, null, 2));
+    writeFile(baseDir + `${version}-proofChainSimpleConfig${i+1}.json`, JSON.stringify(proofConfigChain, null, 2));
     // temporarily add doc's context to proof options for canonization
     proofConfigChain["@context"] = document["@context"];
     // Dave's algorithm update
@@ -92,7 +92,7 @@ async function secureDocument(document) {
     console.log(`Matching proofs for i = ${i}`);
     console.log(matchingProofs);
     // Canonize the "chained" document
-    writeFile(baseDir + `proofChainSimpleTempDoc${i+1}.json`, JSON.stringify(document, null, 2));
+    writeFile(baseDir + `${version}-proofChainSimpleTempDoc${i+1}.json`, JSON.stringify(document, null, 2));
     cannon = await jsonld.canonize(document);
   
     // Hash canonized chained document
@@ -114,14 +114,14 @@ async function secureDocument(document) {
     let signature = await ed.sign(combinedHash, privKey);
     proofConfigChain.proofValue = base58btc.encode(signature);
     delete proofConfigChain['@context'];
-    writeFile(baseDir + `proofChainSimpleConfigSigned${i+1}.json`, JSON.stringify(proofConfigChain, null, 2));
+    writeFile(baseDir + `${version}-proofChainSimpleConfigSigned${i+1}.json`, JSON.stringify(proofConfigChain, null, 2));
   
   // Construct Signed Document
     signedDocument = structuredClone(document);
     signedDocument.proof = allProofs.concat(proofConfigChain);
   
   // console.log(JSON.stringify(signedDocument, null, 2));
-    writeFile(baseDir + `signedProofChainSimple${i+1}.json`, JSON.stringify(signedDocument, null, 2));
+    writeFile(baseDir + `${version}-signedProofChainSimple${i+1}.json`, JSON.stringify(signedDocument, null, 2));
   }
 }
 
@@ -160,6 +160,6 @@ function getVM(key) {
     '#' + key.publicKeyMultibase
 }
 
-for(const [version, doc] of documents) {
-  await secureDocument(doc);
+for(const [version, document] of documents) {
+  await secureDocument({version, document});
 }
