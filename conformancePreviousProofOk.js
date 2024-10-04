@@ -32,7 +32,13 @@ const documents = new Map([
 ]);
 
 
-async function secureDocument({version, document}) {
+async function secureDocument({
+  credential,
+  proofIds = ["urn:uuid:26329423-bec9-4b2e-88cb-a7c7d9dc4544"],
+  fileName,
+  previousProofType
+}) {
+  const document = structuredClone(credential);
   // Signed Document Creation Steps:
   
   // Canonize the document
@@ -47,11 +53,12 @@ async function secureDocument({version, document}) {
   // console.log(bytesToHex(docHash));
   // writeFile(baseDir + 'docHashDataInt.txt', bytesToHex(docHash));
   
-  const proofIds = ["urn:uuid:26329423-bec9-4b2e-88cb-a7c7d9dc4544"];
   
   // **Proof Chains** starting from document
   let signedDocument = structuredClone(document);
   const chainKeys = [keyPairs.keyPair1, keyPairs.keyPair2];
+  // set the first entry to null to prevent the first proof
+  // from having a previousProof set
   const previousProofs = [null, proofIds[0]]; // Simple proof chain
   for (let i = 0; i < chainKeys.length; i++) {
     let allProofs;
@@ -81,9 +88,14 @@ async function secureDocument({version, document}) {
   
     proofConfigChain.proofPurpose = "assertionMethod";
     if (previousProofs[i]) { // If no previous proof don't set the option.
-      proofConfigChain.previousProof = previousProofs[i];
+      if(previousProofType === 'string') {
+        proofConfigChain.previousProof = previousProofs[i];
+      }
+      if(previousProofType === 'Array') {
+        proofConfigChain.previousProof = [previousProofs[i]];
+      }
     }
-    writeFile(baseDir + `${version}-proofChainSimpleConfig${i+1}.json`, JSON.stringify(proofConfigChain, null, 2));
+    writeFile(baseDir + `${fileName}-SimpleConfig${i+1}.json`, JSON.stringify(proofConfigChain, null, 2));
     // temporarily add doc's context to proof options for canonization
     proofConfigChain["@context"] = document["@context"];
     // Dave's algorithm update
@@ -92,7 +104,7 @@ async function secureDocument({version, document}) {
     console.log(`Matching proofs for i = ${i}`);
     console.log(matchingProofs);
     // Canonize the "chained" document
-    writeFile(baseDir + `${version}-proofChainSimpleTempDoc${i+1}.json`, JSON.stringify(document, null, 2));
+    writeFile(baseDir + `${fileName}-SimpleTempDoc${i+1}.json`, JSON.stringify(document, null, 2));
     cannon = await jsonld.canonize(document);
   
     // Hash canonized chained document
@@ -114,14 +126,14 @@ async function secureDocument({version, document}) {
     let signature = await ed.sign(combinedHash, privKey);
     proofConfigChain.proofValue = base58btc.encode(signature);
     delete proofConfigChain['@context'];
-    writeFile(baseDir + `${version}-proofChainSimpleConfigSigned${i+1}.json`, JSON.stringify(proofConfigChain, null, 2));
+    writeFile(baseDir + `${fileName}-SimpleConfigSigned${i+1}.json`, JSON.stringify(proofConfigChain, null, 2));
   
   // Construct Signed Document
     signedDocument = structuredClone(document);
     signedDocument.proof = allProofs.concat(proofConfigChain);
   
   // console.log(JSON.stringify(signedDocument, null, 2));
-    writeFile(baseDir + `${version}-signedProofChainSimple${i+1}.json`, JSON.stringify(signedDocument, null, 2));
+    writeFile(baseDir + `${fileName}-SimpleSinged${i+1}.json`, JSON.stringify(signedDocument, null, 2));
   }
 }
 
@@ -160,6 +172,17 @@ function getVM(key) {
     '#' + key.publicKeyMultibase
 }
 
-for(const [version, document] of documents) {
-  await secureDocument({version, document});
+for(const [version, credential] of documents) {
+  await secureDocument({
+    credential,
+    fileName: `${version}-previousProofString`,
+    previousProofType: 'string'
+  });
+}
+for(const [version, credential] of documents) {
+  await secureDocument({
+    credential,
+    fileName: `${version}-previousProofArray`,
+    previousProofType: 'Array'
+  });
 }
