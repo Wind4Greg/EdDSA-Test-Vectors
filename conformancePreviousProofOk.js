@@ -164,6 +164,7 @@ function findMatchingProofs(prevProofs, proofs) {
   return matches;
 }
 
+// take in a key document and returns a verificationMethod
 function getVM(key) {
   if(!key) {
     throw new Error(`Expected a key document got ${key}`)
@@ -172,6 +173,7 @@ function getVM(key) {
     '#' + key.publicKeyMultibase
 }
 
+// create versioned VCs with previousProof as string
 for(const [version, credential] of documents) {
   await secureDocument({
     credential,
@@ -179,6 +181,7 @@ for(const [version, credential] of documents) {
     previousProofType: 'string'
   });
 }
+// create versioned VCs with previousProof as an Array
 for(const [version, credential] of documents) {
   await secureDocument({
     credential,
