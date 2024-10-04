@@ -3,7 +3,7 @@
     proof chain using Ed25519 signatures.
 */
 
-import { mkdir, readFile, writeFile } from 'fs/promises';
+import { mkdir, writeFile } from 'fs/promises';
 import { createRequire } from 'module';
 import jsonld from 'jsonld';
 import { localLoader } from './documentLoader.js';
@@ -17,6 +17,7 @@ const require = createRequire(import.meta.url);
 
 // Create output directory for the results
 const baseDir = "./output/eddsa-rdfc-2022/conformance";
+// recursively create the dirs for the baseDir is needed
 let status = await mkdir(baseDir, {recursive: true});
 
 jsonld.documentLoader = localLoader; // Local loader for JSON-LD
@@ -47,7 +48,7 @@ let docHash = sha256(cannon); // @noble/hash will convert string to bytes via UT
 const proofIds = ["urn:uuid:26329423-bec9-4b2e-88cb-a7c7d9dc4544"];
 
 // **Proof Chains** starting from document
-let signedDocument = Object.assign({}, document);
+let signedDocument = structuredClone(document);
 const chainKeys = [keyPairs.keyPair1, keyPairs.keyPair2];
 const previousProofs = [null, proofIds[0]]; // Simple proof chain
 for (let i = 0; i < chainKeys.length; i++) {
@@ -74,14 +75,14 @@ for (let i = 0; i < chainKeys.length; i++) {
   }
   proofConfigChain.cryptosuite = "eddsa-rdfc-2022";
   proofConfigChain.created = `2023-02-26T22:${i}6:38Z`; // Signing later for realism ;-)
-  proofConfigChain.verificationMethod = 'did:key:' + chainKeys[i].publicKeyMultibase + 
-    '#' + chainKeys[i].publicKeyMultibase;
+  proofConfigChain.verificationMethod = getVM(chainKeys[i]);
 
   proofConfigChain.proofPurpose = "assertionMethod";
   if (previousProofs[i]) { // If no previous proof don't set the option.
     proofConfigChain.previousProof = previousProofs[i];
   }
   writeFile(baseDir + `proofChainSimpleConfig${i+1}.json`, JSON.stringify(proofConfigChain, null, 2));
+  // temporarily add doc's context to proof options for canonization
   proofConfigChain["@context"] = document["@context"];
   // Dave's algorithm update
   let matchingProofs = findMatchingProofs(previousProofs[i], allProofs);
@@ -146,4 +147,12 @@ function findMatchingProofs(prevProofs, proofs) {
       matches.push(matchProof);
   }
   return matches;
+}
+
+function getVM(key) {
+  if(!key) {
+    throw new Error(`Expected a key document got ${key}`)
+  }
+  return 'did:key:' + key.publicKeyMultibase + 
+    '#' + key.publicKeyMultibase
 }
