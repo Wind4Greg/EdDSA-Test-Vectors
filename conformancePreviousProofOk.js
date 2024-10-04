@@ -189,3 +189,13 @@ for(const [version, credential] of documents) {
     previousProofType: 'Array'
   });
 }
+
+// create versioned VCs with previousProof as an Array
+for(const [version, credential] of documents) {
+  await secureDocument({
+    credential,
+    fileName: `${version}-previousProofNotUrlFail`,
+    previousProofType: 'string',
+    proofIds: ['notUrl']
+  });
+}
