@@ -28,6 +28,61 @@ const documents = new Map([
   ['2.0', require('./input/v2/unsecured.json')]
 ]);
 
+// function to get all matching proofs (only first level no dependencies)
+// prevProofs is either a string or an array
+// proofs is an array of proofs
+const findMatchingProofs = {
+  valid(prevProofs, proofs) {
+    console.log(`findMatch called with ${prevProofs}`);
+    let matches = [];
+    if (!prevProofs) { // In case of no previous proof edge case
+      return matches;
+    }
+    if (Array.isArray(prevProofs)) {
+        prevProofs.forEach(pp => {
+          let matchProof = proofs.find(p => p.id === pp);
+          if (!matchProof) {
+            throw new Error(`Missing proof for id = ${pp}`);
+          }
+          matches.push(matchProof);
+        })
+    } else {
+        let matchProof = proofs.find(p => p.id === prevProofs);
+        if (!matchProof) {
+          throw new Error(`Missing proof for id = ${prevProofs}`);
+        }
+        matches.push(matchProof);
+    }
+    return matches;
+  },
+  invalidType(prevProofs, proofs) {
+    console.log(`findMatch called with ${prevProofs}`);
+    let matches = [];
+    if (!prevProofs) { // In case of no previous proof edge case
+      return matches;
+    }
+    if (Array.isArray(prevProofs)) {
+        prevProofs.forEach(pp => {
+          // NOTE String is strictly for allowing the creation
+          // of invalid test data in this case a number as a previousProof
+          let matchProof = proofs.find(p => p.id === String(pp));
+          if (!matchProof) {
+            throw new Error(`Missing proof for id = ${pp}`);
+          }
+          matches.push(matchProof);
+        })
+    } else {
+        // NOTE String is strictly for allowing the creation
+        // of invalid test data in this case a number as a previousProof
+        let matchProof = proofs.find(p => p.id === String(prevProofs));
+        if (!matchProof) {
+          throw new Error(`Missing proof for id = ${prevProofs}`);
+        }
+        matches.push(matchProof);
+    }
+    return matches;
+  }
+}
 // create versioned VCs with previousProof as string
 for(const [version, credential] of documents) {
   await secureDocument({
@@ -35,7 +90,7 @@ for(const [version, credential] of documents) {
     credential,
     fileName: `${version}-previousProofStringOk`,
     previousProofType: 'string',
-    findMatchingProofs,
+    findMatchingProofs: findMatchingProofs.valid,
     chainKeys
   });
 }
@@ -45,7 +100,7 @@ for(const [version, credential] of documents) {
     baseDir,
     credential,
     fileName: `${version}-previousProofArrayOk`,
-    findMatchingProofs,
+    findMatchingProofs: findMatchingProofs.valid,
     previousProofType: 'Array',
     chainKeys
   });
@@ -58,40 +113,11 @@ for(const [version, credential] of documents) {
     credential,
     chainKeys,
     fileName: `${version}-previousProofNotStringFail`,
-    findMatchingProofs,
+    findMatchingProofs: findMatchingProofs.invalidType,
     previousProofType: 'string',
     proofIds: [456321]
   });
 }
 
 
-// function to get all matching proofs (only first level no dependencies)
-// prevProofs is either a string or an array
-// proofs is an array of proofs
-function findMatchingProofs(prevProofs, proofs) {
-  console.log(`findMatch called with ${prevProofs}`);
-  let matches = [];
-  if (!prevProofs) { // In case of no previous proof edge case
-    return matches;
-  }
-  if (Array.isArray(prevProofs)) {
-      prevProofs.forEach(pp => {
-        // NOTE String is strictly for allowing the creation
-        // of invalid test data in this case a number as a previousProof
-        let matchProof = proofs.find(p => p.id === String(pp));
-        if (!matchProof) {
-          throw new Error(`Missing proof for id = ${pp}`);
-        }
-        matches.push(matchProof);
-      })
-  } else {
-      // NOTE String is strictly for allowing the creation
-      // of invalid test data in this case a number as a previousProof
-      let matchProof = proofs.find(p => p.id === String(prevProofs));
-      if (!matchProof) {
-        throw new Error(`Missing proof for id = ${prevProofs}`);
-      }
-      matches.push(matchProof);
-  }
-  return matches;
-}
+
