@@ -11,7 +11,8 @@ export async function secureDocument({
   baseDir,
   chainKeys,
   credential,
-  proofIds = ["urn:uuid:26329423-bec9-4b2e-88cb-a7c7d9dc4544"],
+  proofIds,
+  previousProofs,
   fileName,
   previousProofType,
   findMatchingProofs,
@@ -20,31 +21,28 @@ export async function secureDocument({
   const document = structuredClone(credential);
   if(debug) {
     // Signed Document Creation Steps:
-    
+
     // Canonize the document
     let cannon = await jsonld.canonize(document);
     console.log("Canonized unsigned document:")
     console.log(cannon);
     writeFile(baseDir + 'canonDocDataInt.txt', cannon);
-    
+
     // Hash canonized document
     let docHash = sha256(cannon); // @noble/hash will convert string to bytes via UTF-8
     console.log("Hash of canonized document in hex:")
     console.log(bytesToHex(docHash));
     writeFile(baseDir + 'docHashDataInt.txt', bytesToHex(docHash));
   }
-  
-  
+
+
   // **Proof Chains** starting from document
   let signedDocument = structuredClone(document);
-  // set the first entry to null to prevent the first proof
-  // from having a previousProof set
-  const previousProofs = [null, proofIds[0]]; // Simple proof chain
   for (let i = 0; i < chainKeys.length; i++) {
     let allProofs;
     if (Array.isArray(signedDocument.proof)) {
       allProofs = signedDocument.proof;
-    } else { 
+    } else {
       if (signedDocument.proof === undefined) {
         allProofs = [];
       } else {
@@ -65,7 +63,7 @@ export async function secureDocument({
     proofConfigChain.cryptosuite = "eddsa-rdfc-2022";
     proofConfigChain.created = `2023-02-26T22:${i}6:38Z`; // Signing later for realism ;-)
     proofConfigChain.verificationMethod = getVM(chainKeys[i]);
-  
+
     proofConfigChain.proofPurpose = "assertionMethod";
     if (previousProofs[i]) { // If no previous proof don't set the option.
       if(previousProofType === 'string') {
@@ -86,19 +84,19 @@ export async function secureDocument({
     // Canonize the "chained" document
     writeFile(baseDir + `${fileName}-SimpleTempDoc${i+1}.json`, JSON.stringify(document, null, 2));
     const cannon = await jsonld.canonize(document);
-  
+
     // Hash canonized chained document
     const docHash = sha256(cannon); // @noble/hash will convert string to bytes via UTF-8
-  
+
     // canonize the proof config
     let proofCanon = await jsonld.canonize(proofConfigChain);
-  
+
     // Hash canonized proof config
     let proofHash = sha256(proofCanon); // @noble/hash will convert string to bytes via UTF-8
-  
+
     // Combine hashes
     let combinedHash = concatBytes(proofHash, docHash);
-  
+
     // Sign
     let privKey = base58btc.decode(chainKeys[i].privateKeyMultibase);
     privKey = privKey.slice(2, 34); // only want the first 2-34 bytes
@@ -107,11 +105,11 @@ export async function secureDocument({
     proofConfigChain.proofValue = base58btc.encode(signature);
     delete proofConfigChain['@context'];
     writeFile(baseDir + `${fileName}-SimpleConfigSigned${i+1}.json`, JSON.stringify(proofConfigChain, null, 2));
-  
+
   // Construct Signed Document
     signedDocument = structuredClone(document);
     signedDocument.proof = allProofs.concat(proofConfigChain);
-  
+
   // console.log(JSON.stringify(signedDocument, null, 2));
     writeFile(baseDir + `${fileName}-SimpleSinged${i+1}.json`, JSON.stringify(signedDocument, null, 2));
   }
@@ -123,7 +121,7 @@ function getVM(key) {
   if(!key) {
     throw new Error(`Expected a key document got ${key}`)
   }
-  return 'did:key:' + key.publicKeyMultibase + 
+  return 'did:key:' + key.publicKeyMultibase +
     '#' + key.publicKeyMultibase
 }
 

@@ -22,6 +22,12 @@ jsonld.documentLoader = localLoader; // Local loader for JSON-LD
 const keyPairs = require('./input/multiKeyPairs.json');
 const chainKeys = [keyPairs.keyPair1, keyPairs.keyPair2]
 
+const previousProof = 'urn:uuid:26329423-bec9-4b2e-88cb-a7c7d9dc4544';
+const proofIds = [previousProof];
+// set the first entry to null to prevent the first proof
+// from having a previousProof set
+const previousProofs = [null, previousProof];
+
 // Read input documents from files.
 const documents = new Map([
   ['1.1', require('./input/v1/unsecured.json')],
@@ -90,6 +96,8 @@ for(const [version, credential] of documents) {
     credential,
     fileName: `${version}-previousProofStringOk`,
     previousProofType: 'string',
+    proofIds,
+    previousProofs,
     findMatchingProofs: findMatchingProofs.valid,
     chainKeys
   });
@@ -102,6 +110,8 @@ for(const [version, credential] of documents) {
     fileName: `${version}-previousProofArrayOk`,
     findMatchingProofs: findMatchingProofs.valid,
     previousProofType: 'Array',
+    proofIds,
+    previousProofs,
     chainKeys
   });
 }
@@ -115,7 +125,8 @@ for(const [version, credential] of documents) {
     fileName: `${version}-previousProofNotStringFail`,
     findMatchingProofs: findMatchingProofs.invalidType,
     previousProofType: 'string',
-    proofIds: [456321]
+    previousProofs: [456321],
+    proofIds: ['456321']
   });
 }
 
