@@ -87,6 +87,11 @@ const findMatchingProofs = {
         matches.push(matchProof);
     }
     return matches;
+  },
+  missingPreviousProof(prevProofs, proofs){
+    // for this test prevProofs don't match proof ids
+    // so just return the proofs
+    return proofs;
   }
 }
 // create versioned VCs with previousProof as string
@@ -130,5 +135,16 @@ for(const [version, credential] of documents) {
   });
 }
 
-
-
+// create versioned VCs with previousProof as a Number
+for(const [version, credential] of documents) {
+  await secureDocument({
+    baseDir,
+    credential,
+    chainKeys,
+    fileName: `${version}-previousProofMissingFail`,
+    findMatchingProofs: findMatchingProofs.missingPreviousProof,
+    previousProofType: 'string',
+    previousProofs: [null, 'urn:uuid:38329423-2179-4b2e-88cb-a7c7d9dc4544'],
+    proofIds
+  });
+}
