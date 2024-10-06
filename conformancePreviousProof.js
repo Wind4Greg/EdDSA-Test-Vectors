@@ -135,7 +135,7 @@ for(const [version, credential] of documents) {
   });
 }
 
-// create versioned VCs with previousProof as a Number
+// create versioned VCs with missing previousProof
 for(const [version, credential] of documents) {
   await secureDocument({
     baseDir,
@@ -144,6 +144,7 @@ for(const [version, credential] of documents) {
     fileName: `${version}-previousProofMissingFail`,
     findMatchingProofs: findMatchingProofs.missingPreviousProof,
     previousProofType: 'string',
+    // this will result in a signed VC with a missing previousProof
     previousProofs: [null, 'urn:uuid:38329423-2179-4b2e-88cb-a7c7d9dc4544'],
     proofIds
   });
