@@ -127,13 +127,17 @@ function findMatchingProofs(prevProofs, proofs) {
   }
   if (Array.isArray(prevProofs)) {
       prevProofs.forEach(pp => {
-        let matchProof = proofs.find(p => p.id === pp);
+        // NOTE String is strictly for allowing the creation
+        // of invalid test data in this case a number as a previousProof
+        let matchProof = proofs.find(p => p.id === String(pp));
         if (!matchProof) {
           throw new Error(`Missing proof for id = ${pp}`);
         }
         matches.push(matchProof);
       })
   } else {
+      // NOTE String is strictly for allowing the creation
+      // of invalid test data in this case a number as a previousProof
       let matchProof = proofs.find(p => p.id === String(prevProofs));
       if (!matchProof) {
         throw new Error(`Missing proof for id = ${prevProofs}`);
