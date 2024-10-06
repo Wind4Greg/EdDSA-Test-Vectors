@@ -58,7 +58,7 @@ export async function secureDocument({
     let proofConfigChain = {};
     proofConfigChain.type = "DataIntegrityProof";
     if (i !== (chainKeys.length - 1)) { // Don't need id for last item in chain
-      proofConfigChain.id = String(proofIds[i]);
+      proofConfigChain.id = proofIds[i];
     }
     proofConfigChain.cryptosuite = "eddsa-rdfc-2022";
     proofConfigChain.created = `2023-02-26T22:${i}6:38Z`; // Signing later for realism ;-)
@@ -124,4 +124,3 @@ function getVM(key) {
   return 'did:key:' + key.publicKeyMultibase +
     '#' + key.publicKeyMultibase
 }
-

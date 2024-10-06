@@ -71,7 +71,7 @@ const findMatchingProofs = {
         prevProofs.forEach(pp => {
           // NOTE String is strictly for allowing the creation
           // of invalid test data in this case a number as a previousProof
-          let matchProof = proofs.find(p => p.id === String(pp));
+          let matchProof = proofs.find(p => String(p.id) === String(pp));
           if (!matchProof) {
             throw new Error(`Missing proof for id = ${pp}`);
           }
@@ -80,7 +80,7 @@ const findMatchingProofs = {
     } else {
         // NOTE String is strictly for allowing the creation
         // of invalid test data in this case a number as a previousProof
-        let matchProof = proofs.find(p => p.id === String(prevProofs));
+        let matchProof = proofs.find(p => String(p.id) === String(prevProofs));
         if (!matchProof) {
           throw new Error(`Missing proof for id = ${prevProofs}`);
         }
@@ -125,7 +125,7 @@ for(const [version, credential] of documents) {
     fileName: `${version}-previousProofNotStringFail`,
     findMatchingProofs: findMatchingProofs.invalidType,
     previousProofType: 'string',
-    previousProofs: [456321],
+    previousProofs: [null, 456321],
     proofIds: ['456321']
   });
 }
