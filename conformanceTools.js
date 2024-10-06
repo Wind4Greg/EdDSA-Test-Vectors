@@ -111,7 +111,7 @@ export async function secureDocument({
     signedDocument.proof = allProofs.concat(proofConfigChain);
 
   // console.log(JSON.stringify(signedDocument, null, 2));
-    writeFile(baseDir + `${fileName}-SimpleSinged${i+1}.json`, JSON.stringify(signedDocument, null, 2));
+    writeFile(baseDir + `${fileName}-SimpleSigned${i+1}.json`, JSON.stringify(signedDocument, null, 2));
   }
 }
 
