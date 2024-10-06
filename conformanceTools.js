@@ -14,6 +14,7 @@ export async function secureDocument({
   proofIds = ["urn:uuid:26329423-bec9-4b2e-88cb-a7c7d9dc4544"],
   fileName,
   previousProofType,
+  findMatchingProofs,
   debug = false
 }) {
   const document = structuredClone(credential);
@@ -116,36 +117,6 @@ export async function secureDocument({
   }
 }
 
-// function to get all matching proofs (only first level no dependencies)
-// prevProofs is either a string or an array
-// proofs is an array of proofs
-function findMatchingProofs(prevProofs, proofs) {
-  console.log(`findMatch called with ${prevProofs}`);
-  let matches = [];
-  if (!prevProofs) { // In case of no previous proof edge case
-    return matches;
-  }
-  if (Array.isArray(prevProofs)) {
-      prevProofs.forEach(pp => {
-        // NOTE String is strictly for allowing the creation
-        // of invalid test data in this case a number as a previousProof
-        let matchProof = proofs.find(p => p.id === String(pp));
-        if (!matchProof) {
-          throw new Error(`Missing proof for id = ${pp}`);
-        }
-        matches.push(matchProof);
-      })
-  } else {
-      // NOTE String is strictly for allowing the creation
-      // of invalid test data in this case a number as a previousProof
-      let matchProof = proofs.find(p => p.id === String(prevProofs));
-      if (!matchProof) {
-        throw new Error(`Missing proof for id = ${prevProofs}`);
-      }
-      matches.push(matchProof);
-  }
-  return matches;
-}
 
 // take in a key document and returns a verificationMethod
 function getVM(key) {
