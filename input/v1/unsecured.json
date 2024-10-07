@@ -2,6 +2,7 @@
     "@context": [
         "https://www.w3.org/2018/credentials/v1",
       {"@context": {
+        "AlumniCredential": "https://www.example.org/AlumniCredential",
         "alumniOf": "https://www.example.org/alumniOf",
         "description": "https://www.example.com/description",
         "name": "https://www.example.com/name"
