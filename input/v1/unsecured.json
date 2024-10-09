@@ -1,6 +1,7 @@
 {
     "@context": [
         "https://www.w3.org/2018/credentials/v1",
+        "https://w3id.org/security/data-integrity/v2",
       {"@context": {
         "AlumniCredential": "https://www.example.org/AlumniCredential",
         "alumniOf": "https://www.example.org/alumniOf",
