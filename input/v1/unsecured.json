@@ -5,8 +5,8 @@
       {"@context": {
         "AlumniCredential": "https://www.example.org/AlumniCredential",
         "alumniOf": "https://www.example.org/alumniOf",
-        "description": "https://www.example.com/description",
-        "name": "https://www.example.com/name"
+        "description": "https://schema.org/description",
+        "name": "https://schema.org/name"
       }}
     ],
     "id": "urn:uuid:58172aac-d8ba-11ed-83dd-0b3aef56cc33",
