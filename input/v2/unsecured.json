@@ -11,7 +11,7 @@
     "type": ["VerifiableCredential", "AlumniCredential"],
     "name": "Alumni Credential",
     "description": "A minimum viable example of a VC 2.0 Alumni Credential.",
-    "issuer": "https://vc.example/issuers/5678",
+    "issuer": "did:key:z6MkhWqdDBPojHA7cprTGTt5yHv5yUi1B8cnXn8ReLumkw6E",
     "validFrom": "2023-01-01T00:00:00Z",
     "credentialSubject": {
         "id": "did:example:abcdefgh",
