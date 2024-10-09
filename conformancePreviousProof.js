@@ -141,9 +141,23 @@ for(const [version, credential] of documents) {
     baseDir,
     credential,
     chainKeys,
-    fileName: `${version}-previousProofMissingFail`,
+    fileName: `${version}-previousProofStringMissingFail`,
     findMatchingProofs: findMatchingProofs.missingPreviousProof,
     previousProofType: 'string',
+    // this will result in a signed VC with a missing previousProof
+    previousProofs: [null, 'urn:uuid:38329423-2179-4b2e-88cb-a7c7d9dc4544'],
+    proofIds
+  });
+}
+// create versioned VCs with missing previousProof
+for(const [version, credential] of documents) {
+  await secureDocument({
+    baseDir,
+    credential,
+    chainKeys,
+    fileName: `${version}-previousProofArrayMissingFail`,
+    findMatchingProofs: findMatchingProofs.missingPreviousProof,
+    previousProofType: 'Array',
     // this will result in a signed VC with a missing previousProof
     previousProofs: [null, 'urn:uuid:38329423-2179-4b2e-88cb-a7c7d9dc4544'],
     proofIds
