@@ -49,7 +49,7 @@ proofConfig.created = "2023-02-24T23:36:38Z";
 // proofConfig.verificationMethod = "https://vc.example/issuers/5678#" + keyPair.publicKeyMultibase;
 proofConfig.verificationMethod = 'did:key:' + keyPair.publicKeyMultibase + '#' + keyPair.publicKeyMultibase;
 proofConfig.proofPurpose = "assertionMethod";
-// proofConfig["@context"] = document["@context"];  // Don't really need this for JCS
+proofConfig["@context"] = document["@context"]; // We now include this for JCS
 writeFile(baseDir + 'proofConfigJCS.json', JSON.stringify(proofConfig, null, 2));
 
 // canonize the proof config
@@ -73,7 +73,7 @@ writeFile(baseDir + 'combinedHashJCS.txt', bytesToHex(combinedHash));
 let privKey = base58btc.decode(keyPair.privateKeyMultibase);
 privKey = privKey.slice(2, 34); // only want the first 2-34 bytes
 console.log(`Secret key length ${privKey.length}, value in hex:`);
-let signature = await ed.sign(combinedHash, privKey);
+let signature = ed.sign(combinedHash, privKey);
 writeFile(baseDir + 'sigHexJCS.txt', bytesToHex(signature));
 console.log("Computed Signature from private key:");
 console.log(base58btc.encode(signature));
@@ -88,7 +88,6 @@ console.log(`Signature verified: ${result}`);
 
 // Construct Signed Document
 let signedDocument = Object.assign({}, document);
-delete proofConfig['@context'];
 signedDocument.proof = proofConfig;
 signedDocument.proof.proofValue = base58btc.encode(signature);
 

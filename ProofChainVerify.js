@@ -15,7 +15,7 @@ const baseDir = "./output/eddsa-set-chain-2022/";
 jsonld.documentLoader = localLoader;
 
 // Read signed input document from a file or just specify it right here.
-const fname = "signedProofChainSimple2.json"; //"signedProofSet.json"; "proofChainEdDSA1.json"; "signedProofChain2.json"
+const fname = "signedProofChain1.json"; //"signedProofSet2.json"; "signedProofChain2.json";
 const signedDocument = JSON.parse(
     await readFile(
       new URL(baseDir + fname, import.meta.url)

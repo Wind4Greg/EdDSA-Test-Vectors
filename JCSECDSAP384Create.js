@@ -52,6 +52,7 @@ proofConfig.created = "2023-02-24T23:36:38Z";
 proofConfig.verificationMethod = 'did:key:' + keyPair.publicKeyMultibase + '#' 
   + keyPair.publicKeyMultibase;
 proofConfig.proofPurpose = "assertionMethod";
+proofConfig["@context"] = document["@context"]; // We now include this for JCS
 writeFile(baseDir + 'proofConfigJCSECDSAP384.json', JSON.stringify(proofConfig, null, 2));
 
 // canonize the proof config
@@ -88,7 +89,6 @@ console.log(`Signature verified: ${result}`);
 
 // Construct Signed Document
 let signedDocument = Object.assign({}, document);
-delete proofConfig['@context'];
 signedDocument.proof = proofConfig;
 signedDocument.proof.proofValue = base58btc.encode(signature.toCompactRawBytes());
 

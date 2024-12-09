@@ -31,8 +31,7 @@ let document = JSON.parse(
     )
   );
 
-// Signed Document Creation Steps:
-
+let signedDocument = Object.assign({}, document);
 // Canonize the document
 let cannon = await jsonld.canonize(document);
 // console.log("Canonized unsigned document:")
@@ -101,14 +100,16 @@ for (let i = 0; i < setKeys.length; i++) {
   delete proofConfig['@context'];
   writeFile(baseDir + `proofSetConfigSigned${i+1}.json`, JSON.stringify(proofConfig, null, 2));
   proofSet.push(proofConfig);
+  // Construct Signed Document
+  if (proofSet.length > 1) {
+    signedDocument.proof = proofSet;
+  } else {
+    signedDocument.proof = proofSet[0];
+  }
+  // console.log(JSON.stringify(signedDocument, null, 2));
+  writeFile(baseDir + `signedProofSet${i+1}.json`, JSON.stringify(signedDocument, null, 2));
 }
 
-// Construct Signed Document
-let signedDocument = Object.assign({}, document);
-signedDocument.proof = proofSet;
-
-// console.log(JSON.stringify(signedDocument, null, 2));
-writeFile(baseDir + 'signedProofSet.json', JSON.stringify(signedDocument, null, 2));
 
 // **Proof Chains** starting from previous signed document
 
@@ -183,11 +184,11 @@ for (let i = 0; i < chainKeys.length; i++) {
   delete proofConfigChain['@context'];
   writeFile(baseDir + `proofChainConfigSigned${i+1}.json`, JSON.stringify(proofConfigChain, null, 2));
 
-// Construct Signed Document
+  // Construct Signed Document
   signedDocument = Object.assign({}, document);
   signedDocument.proof = allProofs.concat(proofConfigChain);
 
-// console.log(JSON.stringify(signedDocument, null, 2));
+  // console.log(JSON.stringify(signedDocument, null, 2));
   writeFile(baseDir + `signedProofChain${i+1}.json`, JSON.stringify(signedDocument, null, 2));
 }
 
