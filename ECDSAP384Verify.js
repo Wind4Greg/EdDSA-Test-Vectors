@@ -13,8 +13,8 @@ import { P384 } from '@noble/curves/p384';
 import { sha384 } from '@noble/hashes/sha512';
 import { bytesToHex, concatBytes } from '@noble/hashes/utils';
 
-const baseDir = "./output/ecdsa-rdfc-2019-p384/";
-
+// const baseDir = "./output/ecdsa-rdfc-2019-p384/";
+const baseDir = "./output/ecdsa-rdfc-2019-p384/employ/";
 jsonld.documentLoader = localLoader;
 
 // Read signed input document from a file or just specify it right here.

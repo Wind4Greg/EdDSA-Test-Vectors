@@ -11,8 +11,19 @@ import { P384 } from '@noble/curves/p384';
 import { sha384 } from '@noble/hashes/sha512';
 import { bytesToHex, concatBytes, hexToBytes } from '@noble/hashes/utils';
 
+// Set input file and output directory here.
+// const dirsAndFiles = {
+//   outputDir: './output/ecdsa-rdfc-2019-p384/',
+//   inputFile: './input/unsigned.json'
+// }
+
+const dirsAndFiles = {
+  outputDir: './output/ecdsa-rdfc-2019-p384/employ/',
+  inputFile: './input/employmentAuth.json'
+}
+
 // Create output directory for the results
-const baseDir = "./output/ecdsa-rdfc-2019-p384/";
+const baseDir = dirsAndFiles.outputDir;
 let status = await mkdir(baseDir, {recursive: true});
 
 jsonld.documentLoader = localLoader; // Local loader for JSON-LD
@@ -28,7 +39,7 @@ let publicKey = P384.getPublicKey(privateKey);
 // Read input document from a file or just specify it right here.
 let document = JSON.parse(
     await readFile(
-      new URL('./input/unsigned.json', import.meta.url)
+      new URL(dirsAndFiles.inputFile, import.meta.url)
     )
   );
 
@@ -68,7 +79,7 @@ proofConfig.type = "DataIntegrityProof";
 proofConfig.cryptosuite = "ecdsa-rdfc-2019";
 proofConfig.created = "2023-02-24T23:36:38Z";
 // proofConfig.verificationMethod = "https://vc.example/issuers/5678#" + keyPair.publicKeyMultibase;
-proofConfig.verificationMethod = 'did:key:' + keyPair.publicKeyMultibase + '#' 
+proofConfig.verificationMethod = 'did:key:' + keyPair.publicKeyMultibase + '#'
   + keyPair.publicKeyMultibase;
 proofConfig.proofPurpose = "assertionMethod";
 proofConfig["@context"] = document["@context"]; // Missing from draft!!!

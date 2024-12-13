@@ -1,7 +1,8 @@
 /*
     Steps to verify a signed verifiable credential in the *DataIntegrityProof*
-    representation. Run this after DataIntegrityCreate.js or modify to read in
-    a signed file of your choice. Caveat: No error checking is performed.
+    representation with Ed25519 signatures. Run this after DataIntegrityCreate.js
+    or modify to read in a signed file of your choice. Caveat: No error checking
+    is performed.
 */
 import { readFile } from 'fs/promises';
 import { localLoader } from './documentLoader.js';
@@ -11,7 +12,8 @@ import {ed25519 as ed} from '@noble/curves/ed25519';
 import { sha256 } from '@noble/hashes/sha256';
 import { bytesToHex, concatBytes } from '@noble/hashes/utils';
 
-const baseDir = "./output/eddsa-rdfc-2022/";
+// const baseDir = "./output/eddsa-rdfc-2022/";
+const baseDir = "./output/eddsa-rdfc-2022/employ/";
 
 jsonld.documentLoader = localLoader;
 

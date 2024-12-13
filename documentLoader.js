@@ -1,5 +1,6 @@
 import jsonld from 'jsonld';
 import { citizenv1 } from './contexts/citizenship-v1.js';
+import { citizenv4 } from './contexts/citizenship-v4rc1.js';
 import { vcv2 } from './contexts/credv2.js';
 import { examplesv2 } from './contexts/examples-v2.js';
 import { vcv1 } from './contexts/credv1.js';
@@ -13,6 +14,7 @@ const CONTEXTS = {
     "https://www.w3.org/ns/credentials/examples/v2": { "@context": examplesv2 },
     "https://www.w3.org/2018/credentials/v1": { "@context": vcv1 },
     "https://w3id.org/citizenship/v1": { "@context": citizenv1 },
+    "https://w3id.org/citizenship/v4rc1": { "@context": citizenv4 },
     "https://w3id.org/security/suites/ed25519-2020/v1": { "@context": edv1 },
     "https://w3id.org/security/data-integrity/v2": {"@context": diV2 }
 };

@@ -13,7 +13,8 @@ import { P256 } from '@noble/curves/p256';
 import { sha256 } from '@noble/hashes/sha256';
 import { bytesToHex, concatBytes } from '@noble/hashes/utils';
 
-const baseDir = "./output/ecdsa-rdfc-2019-p256/";
+// const baseDir = "./output/ecdsa-rdfc-2019-p256/";
+const baseDir = "./output/ecdsa-rdfc-2019-p256/employ/";
 
 jsonld.documentLoader = localLoader;
 
